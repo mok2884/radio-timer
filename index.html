@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="ja">
 <body>
-    <div id="display" style="font-size: 10vw; text-align: center;">00:00</div>
-    <div id="controls" style="text-align: center;">
-        <button id="startBtn" style="display:none; font-size: 20px;">START</button>
+    <div id="display" style="font-size: 50px;">00:00</div>
+    <div id="controls" style="display:none;">
+        <button onclick="sendTime()">1秒進める</button>
     </div>
 
     <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
@@ -12,24 +12,26 @@
         const peer = new Peer(role === 'master' ? 'radio-unique-id-123' : null);
         let conn, time = 0;
 
-        peer.on('open', id => {
-            if (role === 'slave') conn = peer.connect('radio-unique-id-123');
+        peer.on('open', () => {
+            if (role === 'slave') {
+                conn = peer.connect('radio-unique-id-123');
+                conn.on('data', data => {
+                    time = data;
+                    document.getElementById('display').innerText = time;
+                });
+            }
         });
 
         peer.on('connection', c => {
             conn = c;
-            if (role === 'master') {
-                document.getElementById('startBtn').style.display = 'inline-block';
-                document.getElementById('startBtn').onclick = () => {
-                    time += 1000;
-                    document.getElementById('display').innerText = time;
-                    conn.send(time); // ここで強制送信
-                };
-            }
-            conn.on('data', data => {
-                document.getElementById('display').innerText = data;
-            });
+            document.getElementById('controls').style.display = 'block';
         });
+
+        function sendTime() {
+            time += 1;
+            document.getElementById('display').innerText = time;
+            if (conn) conn.send(time);
+        }
     </script>
 </body>
 </html>
