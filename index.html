@@ -1,23 +1,24 @@
 <!DOCTYPE html>
 <html lang="ja">
 <body>
-    <div id="display" style="font-size: 50px;">00:00</div>
-    <div id="controls" style="display:none;">
-        <button onclick="sendTime()">1秒進める</button>
+    <div id="display" style="font-size: 50px; text-align: center;">00:00</div>
+    <div id="controls" style="text-align: center; display:none;">
+        <button onclick="toggleTimer()" id="toggleBtn">START</button>
+        <button onclick="resetTimer()">RESET</button>
     </div>
 
     <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
     <script>
         const role = new URLSearchParams(window.location.search).get('role');
         const peer = new Peer(role === 'master' ? 'radio-unique-id-123' : null);
-        let conn, time = 0;
+        let conn, time = 0, timer = null;
 
         peer.on('open', () => {
             if (role === 'slave') {
                 conn = peer.connect('radio-unique-id-123');
                 conn.on('data', data => {
                     time = data;
-                    document.getElementById('display').innerText = time;
+                    updateDisplay();
                 });
             }
         });
@@ -27,9 +28,31 @@
             document.getElementById('controls').style.display = 'block';
         });
 
-        function sendTime() {
-            time += 1;
-            document.getElementById('display').innerText = time;
+        function updateDisplay() {
+            const m = Math.floor(time / 60);
+            const s = time % 60;
+            document.getElementById('display').innerText = 
+                String(m).padStart(2, '0') + ":" + String(s).padStart(2, '0');
+        }
+
+        function toggleTimer() {
+            if (timer) {
+                clearInterval(timer);
+                timer = null;
+                document.getElementById('toggleBtn').innerText = "START";
+            } else {
+                timer = setInterval(() => {
+                    time++;
+                    updateDisplay();
+                    if (conn) conn.send(time);
+                }, 1000);
+                document.getElementById('toggleBtn').innerText = "STOP";
+            }
+        }
+
+        function resetTimer() {
+            time = 0;
+            updateDisplay();
             if (conn) conn.send(time);
         }
     </script>
