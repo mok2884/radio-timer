@@ -1,66 +1,31 @@
 <!DOCTYPE html>
 <html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <title>Studio Time Sync</title>
-    <style>
-        body { background: #000; color: #fff; text-align: center; font-family: monospace; }
-        #display { font-size: 15vw; }
-        #status { color: #0f0; margin-bottom: 10px; font-size: 14px; }
-    </style>
-</head>
 <body>
-    <div id="status">通信準備中...</div>
-    <div id="display">00:00:00</div>
+    <div id="display" style="font-size: 50px;">Waiting...</div>
     <div id="controls" style="display:none;">
-        <button onclick="startTimer()">START</button>
-        <button onclick="stopTimer()">STOP</button>
-        <button onclick="resetTimer()">RESET</button>
+        <button onclick="conn.send('テスト成功！')">テスト送信</button>
     </div>
 
     <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
     <script>
-        const params = new URLSearchParams(window.location.search);
-        const role = params.get('role');
-        const status = document.getElementById('status');
-        // 絶対にかぶらないID
-        const UNIQUE_ID = 'radio-studio-master-884-sync-2026-special'; 
-        let time = 0, conn, timerInterval;
-
-        const peer = new Peer(role === 'master' ? UNIQUE_ID : null);
+        const role = new URLSearchParams(window.location.search).get('role');
+        const peer = new Peer(role === 'master' ? 'radio-unique-id-123' : null);
+        let conn;
 
         peer.on('open', id => {
-            status.innerText = "ID取得完了 (" + role + ")";
             if (role === 'slave') {
-                status.innerText = "親機を検索中...";
-                conn = peer.connect(UNIQUE_ID);
-                conn.on('open', () => status.innerText = "接続確立！同期待機中");
+                conn = peer.connect('radio-unique-id-123');
+                conn.on('data', data => {
+                    document.getElementById('display').innerText = data; // 受信したら表示
+                });
             }
         });
 
         peer.on('connection', c => {
             conn = c;
-            status.innerText = "子機と接続！";
-            if (role === 'master') document.getElementById('controls').style.display = 'block';
-            conn.on('data', data => { time = data; updateDisplay(); });
+            document.getElementById('controls').style.display = 'block'; // 繋がったらボタン出す
+            document.getElementById('display').innerText = "接続済み";
         });
-
-        function updateDisplay() {
-            const m = String(Math.floor(time/60000)).padStart(2, '0');
-            const s = String(Math.floor((time%60000)/1000)).padStart(2, '0');
-            document.getElementById('display').innerText = `${m}:${s}`;
-        }
-
-        function startTimer() {
-            if (timerInterval) return;
-            timerInterval = setInterval(() => {
-                time += 100;
-                updateDisplay();
-                if (conn) conn.send(time);
-            }, 100);
-        }
-        function stopTimer() { clearInterval(timerInterval); timerInterval = null; }
-        function resetTimer() { time = 0; updateDisplay(); if(conn) conn.send(time); }
     </script>
 </body>
 </html>
