@@ -9,13 +9,16 @@
 
     <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
     <script>
+        // IDを推測困難なものに変更
+        const ROOM_ID = 'radio-studio-master-7f9a2b8c3d1e4';
+        
         const role = new URLSearchParams(window.location.search).get('role');
-        const peer = new Peer(role === 'master' ? 'radio-unique-id-123' : null);
+        const peer = new Peer(role === 'master' ? ROOM_ID : null);
         let conn, time = 0, timer = null;
 
         peer.on('open', () => {
             if (role === 'slave') {
-                conn = peer.connect('radio-unique-id-123');
+                conn = peer.connect(ROOM_ID);
                 conn.on('data', data => {
                     time = data;
                     updateDisplay();
