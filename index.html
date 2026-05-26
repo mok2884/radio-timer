@@ -1,1 +1,68 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Radio Timer System</title>
+    <style>
+        body { margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; background: #000; color: #fff; font-family: monospace; }
+        #display { font-size: 20vw; font-weight: bold; }
+        .controls { position: fixed; bottom: 20px; display: none; }
+        .master .controls { display: block; }
+    </style>
+</head>
+<body>
+    <div id="display">00:00:00</div>
+    <div class="controls">
+        <button onclick="startTimer()">START</button>
+        <button onclick="stopTimer()">STOP</button>
+        <button onclick="resetTimer()">RESET</button>
+    </div>
 
+    <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+    <script>
+        const display = document.getElementById('display');
+        const params = new URLSearchParams(window.location.search);
+        const role = params.get('role'); // 'master' or 'slave'
+        let time = 0, timerInterval = null, peer, conn;
+
+        document.body.className = role;
+
+        if (role === 'master') {
+            peer = new Peer('radio-master-id'); // 固定IDで待ち合わせ
+            peer.on('connection', c => { conn = c; });
+        } else {
+            peer = new Peer();
+            peer.on('open', () => {
+                conn = peer.connect('radio-master-id');
+            });
+        }
+
+        function updateDisplay() {
+            const h = String(Math.floor(time/3600000)).padStart(2, '0');
+            const m = String(Math.floor((time%3600000)/60000)).padStart(2, '0');
+            const s = String(Math.floor((time%60000)/1000)).padStart(2, '0');
+            display.innerText = `${h}:${m}:${s}`;
+        }
+
+        function startTimer() {
+            if (timerInterval) return;
+            timerInterval = setInterval(() => {
+                time += 100;
+                updateDisplay();
+                if (conn) conn.send(time);
+            }, 100);
+        }
+
+        function stopTimer() { clearInterval(timerInterval); timerInterval = null; }
+        function resetTimer() { time = 0; updateDisplay(); if(conn) conn.send(time); }
+
+        // 子機側での受信処理
+        if (role === 'slave') {
+            peer.on('connection', c => {
+                c.on('data', data => { time = data; updateDisplay(); });
+            });
+        }
+    </script>
+</body>
+</html>
