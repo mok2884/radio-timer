@@ -6,14 +6,17 @@
     <style>
         body { background: #000; color: #0f0; font-family: monospace; text-align: center; }
         #display { font-size: 15vw; margin: 20px 0; }
-        .keypad button { font-size: 20px; padding: 10px 20px; margin: 5px; }
+        button { font-size: 20px; padding: 15px; margin: 5px; }
     </style>
 </head>
 <body>
     <div id="display">00:00:00</div>
     <div id="controls" style="display:none;">
-        <div class="keypad" id="keypad"></div>
-        <button onclick="toggleTimer()" id="toggleBtn">START/STOP</button>
+        <div>
+            <button onclick="addTime(10)">+10秒</button>
+            <button onclick="addTime(60)">+1分</button>
+        </div>
+        <button onclick="toggleTimer()" id="toggleBtn">START</button>
         <button onclick="resetTimer()">RESET</button>
     </div>
 
@@ -23,35 +26,41 @@
         const peer = new Peer(role === 'master' ? 'radio-unique-id-123' : null);
         let conn, time = 0, timer = null;
 
-        // テンキー生成
-        const keypad = document.getElementById('keypad');
-        for(let i=0; i<=9; i++) {
-            const btn = document.createElement('button');
-            btn.innerText = i;
-            btn.onclick = () => { time = time * 10 + i; updateDisplay(); if(conn) conn.send(time); };
-            keypad.appendChild(btn);
-        }
-
         peer.on('open', () => { if(role === 'slave') conn = peer.connect('radio-unique-id-123'); });
         peer.on('connection', c => {
             conn = c;
             if(role === 'master') document.getElementById('controls').style.display = 'block';
-            conn.on('data', data => { time = data; updateDisplay(); });
+            conn.on('data', data => { time = data.time; updateDisplay(); });
         });
 
         function updateDisplay() {
-            const h = Math.floor(time / 10000);
-            const m = Math.floor((time % 10000) / 100);
-            const s = time % 100;
+            const h = Math.floor(time / 3600);
+            const m = Math.floor((time % 3600) / 60);
+            const s = time % 60;
             document.getElementById('display').innerText = 
                 [h,m,s].map(v => String(v).padStart(2, '0')).join(':');
         }
 
+        function addTime(sec) { time += sec; updateDisplay(); if(conn) conn.send({time: time}); }
+        
         function toggleTimer() {
-            if (timer) { clearInterval(timer); timer = null; }
-            else { timer = setInterval(() => { if(time>0) time--; updateDisplay(); if(conn) conn.send(time); }, 1000); }
+            if (timer) {
+                clearInterval(timer); timer = null;
+                document.getElementById('toggleBtn').innerText = "START";
+            } else {
+                timer = setInterval(() => {
+                    if(time > 0) time--;
+                    updateDisplay();
+                    if(conn) conn.send({time: time});
+                }, 1000);
+                document.getElementById('toggleBtn').innerText = "STOP";
+            }
         }
-        function resetTimer() { time = 0; updateDisplay(); if(conn) conn.send(time); }
+        function resetTimer() { 
+            time = 0; updateDisplay(); 
+            if(conn) conn.send({time: time});
+            if(timer) { clearInterval(timer); timer = null; document.getElementById('toggleBtn').innerText = "START"; }
+        }
     </script>
 </body>
 </html>
