@@ -2,85 +2,56 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Radio Timer</title>
     <style>
-        body { background: #000; color: #0f0; font-family: monospace; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-        #display { font-size: 15vw; font-weight: bold; margin-bottom: 20px; }
-        .controls { display: flex; flex-direction: column; align-items: center; gap: 10px; }
-        .keypad { display: grid; grid-template-columns: repeat(3, 60px); gap: 10px; }
-        button { padding: 15px; font-size: 20px; }
+        body { background: #000; color: #0f0; font-family: monospace; text-align: center; }
+        #display { font-size: 15vw; margin: 20px 0; }
+        .keypad button { font-size: 20px; padding: 10px 20px; margin: 5px; }
     </style>
 </head>
 <body>
     <div id="display">00:00:00</div>
-    
-    <div id="masterControls" class="controls" style="display:none;">
+    <div id="controls" style="display:none;">
         <div class="keypad" id="keypad"></div>
-        <div>
-            <button onclick="toggleTimer()" id="toggleBtn">START</button>
-            <button onclick="resetTimer()">RESET</button>
-        </div>
+        <button onclick="toggleTimer()" id="toggleBtn">START/STOP</button>
+        <button onclick="resetTimer()">RESET</button>
     </div>
 
     <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
     <script>
         const role = new URLSearchParams(window.location.search).get('role');
         const peer = new Peer(role === 'master' ? 'radio-unique-id-123' : null);
-        let conn, time = 0, timer = null, inputTime = "";
+        let conn, time = 0, timer = null;
 
-        // テンキー作成
+        // テンキー生成
         const keypad = document.getElementById('keypad');
         for(let i=0; i<=9; i++) {
             const btn = document.createElement('button');
             btn.innerText = i;
-            btn.onclick = () => setTime(i);
+            btn.onclick = () => { time = time * 10 + i; updateDisplay(); if(conn) conn.send(time); };
             keypad.appendChild(btn);
         }
 
-        function setTime(num) {
-            inputTime += num;
-            if(inputTime.length > 6) inputTime = inputTime.slice(1);
-            // 入力された数値を秒数に変換 (簡易的にHHMMSSとみなす)
-            const h = parseInt(inputTime.slice(-6, -4) || 0);
-            const m = parseInt(inputTime.slice(-4, -2) || 0);
-            const s = parseInt(inputTime.slice(-2) || 0);
-            time = h*3600 + m*60 + s;
-            updateDisplay();
-            if(conn) conn.send({type: 'sync', time: time});
-        }
+        peer.on('open', () => { if(role === 'slave') conn = peer.connect('radio-unique-id-123'); });
+        peer.on('connection', c => {
+            conn = c;
+            if(role === 'master') document.getElementById('controls').style.display = 'block';
+            conn.on('data', data => { time = data; updateDisplay(); });
+        });
 
         function updateDisplay() {
-            const h = Math.floor(time / 3600);
-            const m = Math.floor((time % 3600) / 60);
-            const s = time % 60;
+            const h = Math.floor(time / 10000);
+            const m = Math.floor((time % 10000) / 100);
+            const s = time % 100;
             document.getElementById('display').innerText = 
                 [h,m,s].map(v => String(v).padStart(2, '0')).join(':');
         }
 
-        // 通信処理
-        peer.on('open', () => { if(role === 'slave') conn = peer.connect('radio-unique-id-123'); });
-        peer.on('connection', c => {
-            conn = c;
-            if(role === 'master') document.getElementById('masterControls').style.display = 'flex';
-            conn.on('data', data => {
-                if(data.type === 'sync') { time = data.time; updateDisplay(); }
-                else if(data.type === 'toggle') toggleTimer();
-            });
-        });
-
         function toggleTimer() {
-            if (timer) { clearInterval(timer); timer = null; document.getElementById('toggleBtn').innerText = "START"; }
-            else {
-                timer = setInterval(() => {
-                    if(time > 0) time--;
-                    updateDisplay();
-                    if(conn) conn.send({type: 'sync', time: time});
-                }, 1000);
-                document.getElementById('toggleBtn').innerText = "STOP";
-            }
+            if (timer) { clearInterval(timer); timer = null; }
+            else { timer = setInterval(() => { if(time>0) time--; updateDisplay(); if(conn) conn.send(time); }, 1000); }
         }
-        function resetTimer() { time = 0; updateDisplay(); if(conn) conn.send({type: 'sync', time: time}); }
+        function resetTimer() { time = 0; updateDisplay(); if(conn) conn.send(time); }
     </script>
 </body>
 </html>
