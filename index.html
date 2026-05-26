@@ -1,31 +1,47 @@
 <!DOCTYPE html>
 <html lang="ja">
 <body>
-    <div id="display" style="font-size: 50px;">Waiting...</div>
-    <div id="controls" style="display:none;">
-        <button onclick="conn.send('テスト成功！')">テスト送信</button>
+    <div id="display" style="font-size: 15vw; text-align: center;">00:00</div>
+    <div id="controls" style="display:none; text-align: center;">
+        <button onclick="startTimer()">START</button>
+        <button onclick="stopTimer()">STOP</button>
+        <button onclick="resetTimer()">RESET</button>
     </div>
 
     <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
     <script>
         const role = new URLSearchParams(window.location.search).get('role');
         const peer = new Peer(role === 'master' ? 'radio-unique-id-123' : null);
-        let conn;
+        let conn, time = 0, timer;
 
         peer.on('open', id => {
             if (role === 'slave') {
                 conn = peer.connect('radio-unique-id-123');
-                conn.on('data', data => {
-                    document.getElementById('display').innerText = data; // 受信したら表示
-                });
             }
         });
 
         peer.on('connection', c => {
             conn = c;
-            document.getElementById('controls').style.display = 'block'; // 繋がったらボタン出す
-            document.getElementById('display').innerText = "接続済み";
+            if (role === 'master') document.getElementById('controls').style.display = 'block';
+            conn.on('data', data => { time = data; updateDisplay(); });
         });
+
+        function updateDisplay() {
+            const m = String(Math.floor(time/60000)).padStart(2, '0');
+            const s = String(Math.floor((time%60000)/1000)).padStart(2, '0');
+            document.getElementById('display').innerText = `${m}:${s}`;
+        }
+
+        function startTimer() {
+            if (timer) return;
+            timer = setInterval(() => {
+                time += 1000; // 1秒ずつ進む
+                updateDisplay();
+                if (conn) conn.send(time);
+            }, 1000);
+        }
+        function stopTimer() { clearInterval(timer); timer = null; }
+        function resetTimer() { time = 0; updateDisplay(); if(conn) conn.send(time); }
     </script>
 </body>
 </html>
