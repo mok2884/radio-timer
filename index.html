@@ -1,18 +1,9 @@
 <!DOCTYPE html>
 <html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <title>Radio Timer</title>
-    <style>
-        body { background: #000; color: #0f0; font-family: monospace; text-align: center; }
-        #display { font-size: 15vw; }
-        button { font-size: 20px; padding: 20px; }
-    </style>
-</head>
 <body>
-    <div id="display">00:00:00</div>
-    <div id="controls">
-        <button onclick="startTimer()">START</button>
+    <div id="display" style="font-size: 50px; text-align: center;">00:00</div>
+    <div id="controls" style="text-align: center; display:none;">
+        <button onclick="toggleTimer()" id="toggleBtn">START</button>
         <button onclick="resetTimer()">RESET</button>
     </div>
 
@@ -25,35 +16,44 @@
         peer.on('open', () => {
             if (role === 'slave') {
                 conn = peer.connect('radio-unique-id-123');
+                conn.on('data', data => {
+                    time = data;
+                    updateDisplay();
+                });
             }
         });
 
-        peer.on('connection', c => { conn = c; });
+        peer.on('connection', c => {
+            conn = c;
+            document.getElementById('controls').style.display = 'block';
+        });
 
         function updateDisplay() {
-            const h = Math.floor(time / 3600);
-            const m = Math.floor((time % 3600) / 60);
+            const m = Math.floor(time / 60);
             const s = time % 60;
             document.getElementById('display').innerText = 
-                [h,m,s].map(v => String(v).padStart(2, '0')).join(':');
+                String(m).padStart(2, '0') + ":" + String(s).padStart(2, '0');
         }
 
-        function startTimer() {
-            if (timer) return;
-            timer = setInterval(() => {
-                time++;
-                updateDisplay();
-                // 接続があるか確認して、あれば送る（原始的なチェック）
-                if (conn && conn.open) {
-                    conn.send(time);
-                }
-            }, 1000);
+        function toggleTimer() {
+            if (timer) {
+                clearInterval(timer);
+                timer = null;
+                document.getElementById('toggleBtn').innerText = "START";
+            } else {
+                timer = setInterval(() => {
+                    time++;
+                    updateDisplay();
+                    if (conn) conn.send(time);
+                }, 1000);
+                document.getElementById('toggleBtn').innerText = "STOP";
+            }
         }
 
         function resetTimer() {
-            clearInterval(timer); timer = null;
-            time = 0; updateDisplay();
-            if (conn && conn.open) conn.send(0);
+            time = 0;
+            updateDisplay();
+            if (conn) conn.send(time);
         }
     </script>
 </body>
