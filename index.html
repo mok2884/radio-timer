@@ -11,7 +11,7 @@
 </head>
 <body>
     <div id="display">00:00:00</div>
-    <div id="controls" style="display:none;">
+    <div id="controls">
         <button onclick="startTimer()">START</button>
         <button onclick="resetTimer()">RESET</button>
     </div>
@@ -22,7 +22,14 @@
         const peer = new Peer(role === 'master' ? 'radio-unique-id-123' : null);
         let conn, time = 0, timer = null;
 
-        // 表示の更新（00:00:00形式）
+        peer.on('open', () => {
+            if (role === 'slave') {
+                conn = peer.connect('radio-unique-id-123');
+            }
+        });
+
+        peer.on('connection', c => { conn = c; });
+
         function updateDisplay() {
             const h = Math.floor(time / 3600);
             const m = Math.floor((time % 3600) / 60);
@@ -31,26 +38,22 @@
                 [h,m,s].map(v => String(v).padStart(2, '0')).join(':');
         }
 
-        peer.on('open', () => { if(role === 'slave') conn = peer.connect('radio-unique-id-123'); });
-        peer.on('connection', c => {
-            conn = c;
-            if(role === 'master') document.getElementById('controls').style.display = 'block';
-            conn.on('data', data => { time = data; updateDisplay(); });
-        });
-
         function startTimer() {
             if (timer) return;
             timer = setInterval(() => {
                 time++;
                 updateDisplay();
-                if (conn) conn.send(time);
+                // 接続があるか確認して、あれば送る（原始的なチェック）
+                if (conn && conn.open) {
+                    conn.send(time);
+                }
             }, 1000);
         }
 
         function resetTimer() {
             clearInterval(timer); timer = null;
             time = 0; updateDisplay();
-            if (conn) conn.send(time);
+            if (conn && conn.open) conn.send(0);
         }
     </script>
 </body>
