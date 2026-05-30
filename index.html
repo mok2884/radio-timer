@@ -56,6 +56,13 @@
     
     let conn, time = 0, timer = null, inputBuffer = "";
 
+    // 操作エリアを表示する関数
+    function showControls() {
+        if (role === 'master') {
+            document.getElementById('uiArea').style.display = 'block';
+        }
+    }
+
     function press(n) { if(inputBuffer.length < 6) { inputBuffer += n; updatePreview(); } }
     function clearInput() { inputBuffer = ""; updatePreview(); }
     function updatePreview() {
@@ -97,15 +104,17 @@
     function setStatus(text, className) { statusEl.innerText = text; statusEl.className = className; }
 
     function connectToMaster() {
+        setStatus("CONNECTING...", "status-connecting");
         conn = peer.connect(MASTER_ID);
-        conn.on('open', () => { setStatus("CONNECTED", "status-connected"); document.getElementById('uiArea').style.display = 'block'; });
+        conn.on('open', () => { setStatus("CONNECTED", "status-connected"); /* 子機は controls を表示しない */ });
         conn.on('data', data => { if(data.type === 'time') { time = data.value; updateDisplay(); } });
         conn.on('close', () => { setStatus("UNLINK", "status-unlink"); setTimeout(connectToMaster, 3000); });
     }
 
     peer.on('open', () => { if(role === 'slave') connectToMaster(); });
     peer.on('connection', c => {
-        conn = c; document.getElementById('uiArea').style.display = 'block';
+        conn = c; 
+        showControls(); // 親機だけ操作エリアが出る
         setStatus("CONNECTED", "status-connected");
         c.on('data', data => { if(data.type === 'time') { time = data.value; updateDisplay(); } });
     });
