@@ -3,95 +3,69 @@
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-    body {
-        margin: 0;
-        font-family: Arial, sans-serif;
-        background: #0f172a;
-        color: #e2e8f0;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-    }
-
-    .container {
-        text-align: center;
-    }
-
-    #display {
-        font-size: 80px;
-        font-weight: bold;
-        margin-bottom: 30px;
-        letter-spacing: 2px;
-    }
-
-    #controls {
-        display: none;
-    }
-
-    button {
-        font-size: 20px;
-        padding: 12px 24px;
-        margin: 8px;
-        border: none;
-        border-radius: 12px;
-        cursor: pointer;
-        transition: 0.2s;
-    }
-
-    #toggleBtn {
-        background: #22c55e;
-        color: white;
-    }
-
-    #toggleBtn:hover {
-        background: #16a34a;
-    }
-
-    button:nth-child(2) {
-        background: #ef4444;
-        color: white;
-    }
-
-    button:nth-child(2):hover {
-        background: #dc2626;
-    }
-
-    button:active {
-        transform: scale(0.95);
-    }
+    body { margin: 0; font-family: sans-serif; background: #0f172a; color: #e2e8f0; display: flex; justify-content: center; align-items: center; height: 100vh; }
+    .container { text-align: center; }
+    #display { font-size: 80px; font-weight: bold; margin-bottom: 30px; }
+    
+    /* 接続ステータスのデザイン */
+    #status { position: fixed; bottom: 20px; right: 20px; font-size: 14px; font-weight: bold; padding: 5px 10px; border-radius: 5px; }
+    .status-connected { color: #22c55e; border: 1px solid #22c55e; }
+    .status-connecting { color: #eab308; border: 1px solid #eab308; }
+    .status-unlink { color: #ef4444; border: 1px solid #ef4444; }
 </style>
 </head>
-
 <body>
+
 <div class="container">
     <div id="display">00:00</div>
-
-    <div id="controls">
+    <div id="controls" style="display: none;">
         <button onclick="toggleTimer()" id="toggleBtn">START</button>
         <button onclick="resetTimer()">RESET</button>
     </div>
 </div>
 
+<div id="status" class="status-unlink">UNLINK</div>
+
 <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script>
     const role = new URLSearchParams(window.location.search).get('role');
     const peer = new Peer(role === 'master' ? 'radio-unique-id-123' : null);
+    const statusEl = document.getElementById('status');
     let conn, time = 0, timer = null;
 
+    function setStatus(text, className) {
+        statusEl.innerText = text;
+        statusEl.className = className;
+    }
+
+    function connectToMaster() {
+        setStatus("CONNECTING...", "status-connecting");
+        conn = peer.connect('radio-unique-id-123');
+        
+        conn.on('open', () => {
+            setStatus("CONNECTED", "status-connected");
+        });
+
+        conn.on('data', data => {
+            time = data;
+            updateDisplay();
+        });
+
+        conn.on('close', () => {
+            setStatus("UNLINK", "status-unlink");
+            setTimeout(connectToMaster, 5000); // 5秒後に再接続
+        });
+    }
+
     peer.on('open', () => {
-        if (role === 'slave') {
-            conn = peer.connect('radio-unique-id-123');
-            conn.on('data', data => {
-                time = data;
-                updateDisplay();
-            });
-        }
+        if (role === 'slave') connectToMaster();
     });
 
     peer.on('connection', c => {
         conn = c;
         document.getElementById('controls').style.display = 'block';
+        setStatus("CONNECTED", "status-connected");
+        c.on('close', () => setStatus("UNLINK", "status-unlink"));
     });
 
     function updateDisplay() {
@@ -103,13 +77,11 @@
 
     function toggleTimer() {
         if (timer) {
-            clearInterval(timer);
-            timer = null;
+            clearInterval(timer); timer = null;
             document.getElementById('toggleBtn').innerText = "START";
         } else {
             timer = setInterval(() => {
-                time++;
-                updateDisplay();
+                time++; updateDisplay();
                 if (conn) conn.send(time);
             }, 1000);
             document.getElementById('toggleBtn').innerText = "STOP";
@@ -117,11 +89,9 @@
     }
 
     function resetTimer() {
-        time = 0;
-        updateDisplay();
+        time = 0; updateDisplay();
         if (conn) conn.send(time);
     }
 </script>
-
 </body>
 </html>
