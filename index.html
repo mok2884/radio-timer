@@ -2,97 +2,95 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Professional Timer</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Time Pro - Professional Independent Edition</title>
     <link href="https://fonts.cdnfonts.com/css/ds-digital" rel="stylesheet">
     <style>
-        body { margin: 0; background: #000; color: #ff4500; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; font-family: 'DS-Digital', monospace; }
-
-        /* 業務用ストップウォッチの表示エリア */
-        #display {
-            display: flex; align-items: center; justify-content: center;
-            border: 4px solid #FFFFFF; border-radius: 20px;
-            padding: 35px 55px; background: rgba(255, 255, 255, 0.05);
-            margin-bottom: 30px;
+        :root { --bg-color: #B2DFDB; --lcd-bg: #c4dbd8; --text-standard: #004D40; }
+        body { margin: 0; background: #B2DFDB; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
+        
+        /* 子機専用デザイン：黒背景・琥珀色・7セグ表示 */
+        body.is-slave { background: #000; }
+        
+        .console { width: 95%; max-width: 480px; }
+        
+        /* 巨大表示エリア（子機・親機共通） */
+        #display-panel { 
+            background-color: var(--lcd-bg); padding: 25px; border-radius: 25px; 
+            border: 10px solid #75bdb3; text-align: right; 
         }
-        .digit { width: 80px; text-align: center; font-size: 11rem; color: #ff4500; text-shadow: 0 0 15px #ff4500; }
-        .separator { width: 40px; text-align: center; font-size: 8rem; color: #ff4500; margin: 0 10px; }
+        body.is-slave #display-panel { background: #000; border: 4px solid #fff; }
 
-        /* 操作パネルエリア（親機のみ表示） */
-        #uiArea { width: 300px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-        button { padding: 15px; font-size: 18px; background: #334155; color: white; border: none; border-radius: 8px; cursor: pointer; }
+        #main-time { 
+            font-family: 'DS-Digital', monospace; font-size: 4.2rem; color: var(--text-standard);
+            font-variant-numeric: tabular-nums;
+        }
+        body.is-slave #main-time { color: #ff4500; font-size: 6rem; text-shadow: 0 0 10px #ff4500; }
 
-        /* ステータス表示 */
-        #status { position: fixed; bottom: 20px; right: 20px; color: #fff; font-size: 12px; }
+        /* 入力確認用表示（親機のみ） */
+        #input-preview { font-size: 1.5rem; color: #666; margin-bottom: 10px; }
+        .is-slave #input-preview { display: none; }
+
+        /* 操作パネル（親機のみ） */
+        .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-top: 20px; }
+        .is-slave .grid { display: none; }
+        button { padding: 20px; font-size: 1.5rem; border: none; border-radius: 15px; background: #4DB6AC; color: white; cursor: pointer; }
     </style>
 </head>
 <body>
 
-<div id="display">
-    <span class="digit" id="h1">0</span><span class="digit" id="h2">0</span>
-    <span class="separator">:</span>
-    <span class="digit" id="m1">0</span><span class="digit" id="m2">0</span>
-    <span class="separator">:</span>
-    <span class="digit" id="s1">0</span><span class="digit" id="s2">0</span>
+<div class="console">
+    <div id="input-preview">--:--:--</div>
+    <div id="display-panel">
+        <div id="main-time">00:00:00</div>
+    </div>
+    <div class="grid">
+        <button onclick="press(1)">1</button><button onclick="press(2)">2</button><button onclick="press(3)">3</button>
+        <button onclick="allClear()">AC</button>
+        <button onclick="press(4)">4</button><button onclick="press(5)">5</button><button onclick="press(6)">6</button>
+        <button onclick="setTimer()">SET</button>
+        <button onclick="press(7)">7</button><button onclick="press(8)">8</button><button onclick="press(9)">9</button>
+        <button onclick="toggleTimer()">RUN</button>
+        <button onclick="press(0)">0</button><button onclick="resetTimer()">RST</button>
+    </div>
 </div>
-
-<div id="uiArea" style="display: none;">
-    <button onclick="toggleTimer()" id="toggleBtn" style="grid-column: span 2;">START</button>
-    <button onclick="resetTimer()">RESET</button>
-    <button onclick="press(1)">1</button><button onclick="press(2)">2</button><button onclick="press(3)">3</button>
-    <button onclick="press(4)">4</button><button onclick="press(5)">5</button><button onclick="press(6)">6</button>
-    <button onclick="press(7)">7</button><button onclick="press(8)">8</button><button onclick="press(9)">9</button>
-    <button onclick="clearInput()">CLR</button><button onclick="press(0)">0</button><button onclick="setTimer()">SET</button>
-</div>
-
-<div id="status">UNLINK</div>
 
 <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script>
     const role = new URLSearchParams(window.location.search).get('role');
+    if (role === 'slave') document.body.classList.add('is-slave');
+
     const MASTER_ID = 'radio-secret-id-998877665544332211';
     const peer = new Peer(role === 'master' ? MASTER_ID : null);
-    let conn, time = 0, timer = null, inputBuffer = "";
+    let conn, time = 0, timer = null, buffer = "";
 
-    // 初期化と表示制御
-    if (role === 'master') document.getElementById('uiArea').style.display = 'grid';
-
-    function updateDisplayView(t) {
-        const str = String(Math.floor(t/3600)).padStart(2,'0') + 
-                    String(Math.floor((t%3600)/60)).padStart(2,'0') + 
-                    String(t%60).padStart(2,'0');
-        ['h1','h2','m1','m2','s1','s2'].forEach((id, i) => document.getElementById(id).innerText = str[i]);
+    function updateDisplay(t) {
+        const h = Math.floor(t / 3600), m = Math.floor((t % 3600) / 60), s = t % 60;
+        document.getElementById('main-time').innerText = 
+            String(h).padStart(2,'0') + ":" + String(m).padStart(2,'0') + ":" + String(s).padStart(2,'0');
     }
 
-    function press(n) { if(inputBuffer.length < 6) inputBuffer += n; }
-    function clearInput() { inputBuffer = ""; }
-    function setTimer() { time = parseInt(inputBuffer || 0); updateDisplayView(time); inputBuffer = ""; if(conn) conn.send({type:'time', value:time}); }
-
-    function toggleTimer() {
-        if (timer) { clearInterval(timer); timer = null; }
-        else {
-            timer = setInterval(() => { time++; updateDisplayView(time); if(conn) conn.send({type:'time', value:time}); }, 1000);
-        }
-    }
-
-    function resetTimer() { clearInterval(timer); timer = null; time = 0; updateDisplayView(time); if(conn) conn.send({type:'time', value:time}); }
-
-    peer.on('open', () => { if(role === 'slave') connectToMaster(); });
+    function press(n) { buffer = (buffer + n).slice(-6); document.getElementById('input-preview').innerText = buffer.padStart(6, '0').replace(/(\d{2})(\d{2})(\d{2})/, "$1:$2:$3"); }
+    function allClear() { buffer = ""; document.getElementById('input-preview').innerText = "--:--:--"; }
+    function setTimer() { time = parseInt(buffer || 0); updateDisplay(time); if(conn) conn.send({type:'time', value:time}); }
     
-    function connectToMaster() {
-        conn = peer.connect(MASTER_ID);
-        conn.on('open', () => document.getElementById('status').innerText = "CONNECTED");
-        conn.on('data', data => {
-            if(data.type === 'time') setTimeout(() => updateDisplayView(data.value + 1), 800);
-        });
-        conn.on('close', () => { document.getElementById('status').innerText = "UNLINK"; setTimeout(connectToMaster, 3000); });
+    function toggleTimer() {
+        if(timer) { clearInterval(timer); timer = null; }
+        else { timer = setInterval(() => { time++; updateDisplay(time); if(conn) conn.send({type:'time', value:time}); }, 1000); }
     }
+    function resetTimer() { time = 0; updateDisplay(0); if(conn) conn.send({type:'time', value:0}); }
 
-    peer.on('connection', c => {
-        conn = c;
-        document.getElementById('status').innerText = "CONNECTED";
-        c.on('data', data => { if(data.type === 'time') updateDisplayView(data.value); });
-    });
+    peer.on('open', () => { if(role === 'slave') connect(); });
+    function connect() {
+        conn = peer.connect(MASTER_ID);
+        conn.on('data', data => {
+            if(data.type === 'time') {
+                // 林さんのこだわり：1秒足して0.8秒遅延
+                setTimeout(() => updateDisplay(data.value + 1), 800);
+            }
+        });
+    }
+    peer.on('connection', c => { conn = c; c.on('data', d => { if(d.type === 'time') updateDisplay(d.value); }); });
 </script>
 </body>
 </html>
