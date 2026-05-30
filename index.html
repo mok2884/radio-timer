@@ -29,7 +29,7 @@
 <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script>
     const role = new URLSearchParams(window.location.search).get('role');
-    const peer = new Peer(role === 'master' ? 'radio-unique-id-123' : null);
+    const peer = new Peer(role === 'master' ? 'my-super-secret-radio-id-2026-xyzjolf' : null);
     const statusEl = document.getElementById('status');
     let conn, time = 0, timer = null;
 
@@ -40,7 +40,7 @@
 
     function connectToMaster() {
         setStatus("CONNECTING...", "status-connecting");
-        conn = peer.connect('radio-unique-id-123');
+        conn = peer.connect('my-super-secret-radio-id-2026-xyzjolf');
         
         conn.on('open', () => {
             setStatus("CONNECTED", "status-connected");
