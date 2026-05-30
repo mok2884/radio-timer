@@ -1,13 +1,18 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link href="https://fonts.googleapis.com/css2?family=Digital+7&display=swap" rel="stylesheet">
 <style>
+    /* 確実に読み込むためのフォント設定 */
+    @font-face {
+        font-family: 'Digital-7';
+        src: url('https://db.onlinewebfonts.com/t/20f4b3017a1a0f9b5c3e4c4d5d7e3a99.woff2') format('woff2');
+    }
+
     body { margin: 0; font-family: sans-serif; background: #0f172a; color: #e2e8f0; display: flex; justify-content: center; align-items: center; height: 100vh; flex-direction: column; }
     .container { text-align: center; }
 
-    /* 表示の箱レイアウト */
     #display { 
         display: flex; 
         justify-content: center; 
@@ -24,13 +29,14 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        font-family: 'Digital-7', monospace;
+        /* フォントをここで確実に適用 */
+        font-family: 'Digital-7', sans-serif;
         font-size: 70px;
         color: #ff9900;
     }
-    .separator { font-size: 50px; font-weight: bold; color: #ff9900; }
+    .separator { font-size: 50px; font-weight: bold; color: #ff9900; font-family: sans-serif; }
 
-    /* その他UI */
+    /* 以下、機能部分は変更なし */
     .control-row { margin-bottom: 20px; }
     .control-btn { background: #1e293b; padding: 12px 24px; border: none; border-radius: 8px; color: white; cursor: pointer; margin: 0 5px; }
     #inputPreview { font-size: 32px; color: #94a3b8; margin-bottom: 10px; font-family: monospace; }
@@ -38,7 +44,6 @@
     button { padding: 15px; font-size: 18px; border: none; border-radius: 8px; cursor: pointer; background: #334155; color: white; }
     button:active { transform: scale(0.95); }
     .action-btn { background: #475569; }
-
     #status { position: fixed; bottom: 20px; right: 20px; font-size: 14px; font-weight: bold; padding: 5px 10px; border-radius: 5px; }
     .status-connected { color: #22c55e; border: 1px solid #22c55e; }
     .status-connecting { color: #eab308; border: 1px solid #eab308; }
@@ -90,7 +95,6 @@
         const d = inputBuffer.padStart(6, '0');
         document.getElementById('inputPreview').innerText = d.slice(0,2) + ":" + d.slice(2,4) + ":" + d.slice(4,6);
     }
-
     function setTimer() {
         if(inputBuffer.length === 0) return;
         const total = parseInt(inputBuffer.padStart(6, '0'));
@@ -99,7 +103,6 @@
         inputBuffer = ""; updatePreview();
         if (conn) conn.send({type: 'time', value: time});
     }
-
     function updateDisplay() {
         const h = String(Math.floor(time / 3600)).padStart(2, '0');
         const m = String(Math.floor((time % 3600) / 60)).padStart(2, '0');
@@ -108,7 +111,6 @@
         document.getElementById('m1').innerText = m[0]; document.getElementById('m2').innerText = m[1];
         document.getElementById('s1').innerText = s[0]; document.getElementById('s2').innerText = s[1];
     }
-
     function toggleTimer() {
         if (timer) { clearInterval(timer); timer = null; document.getElementById('toggleBtn').innerText = "START"; }
         else {
@@ -116,12 +118,9 @@
             document.getElementById('toggleBtn').innerText = "STOP";
         }
     }
-
     function resetTimer() { clearInterval(timer); timer = null; time = 0; updateDisplay(); document.getElementById('toggleBtn').innerText = "START"; if (conn) conn.send({type: 'time', value: time}); }
-
     const statusEl = document.getElementById('status');
     function setStatus(text, className) { statusEl.innerText = text; statusEl.className = className; }
-
     function connectToMaster() {
         setStatus("CONNECTING...", "status-connecting");
         conn = peer.connect(MASTER_ID);
@@ -129,7 +128,6 @@
         conn.on('data', data => { if(data.type === 'time') { time = data.value; updateDisplay(); } });
         conn.on('close', () => { setStatus("UNLINK", "status-unlink"); setTimeout(connectToMaster, 3000); });
     }
-
     peer.on('open', () => { if(role === 'slave') connectToMaster(); });
     peer.on('connection', c => {
         conn = c; 
