@@ -2,17 +2,38 @@
 <html lang="ja">
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Digital+7&display=swap" rel="stylesheet">
 <style>
     body { margin: 0; font-family: sans-serif; background: #0f172a; color: #e2e8f0; display: flex; justify-content: center; align-items: center; height: 100vh; flex-direction: column; }
     .container { text-align: center; }
-    
-    #display { font-size: 80px; font-weight: bold; margin-bottom: 20px; font-family: monospace; }
-    
+
+    /* 表示の箱レイアウト */
+    #display { 
+        display: flex; 
+        justify-content: center; 
+        align-items: center; 
+        gap: 8px; 
+        margin-bottom: 30px;
+    }
+    .digit-box {
+        width: 60px;
+        height: 90px;
+        background: #000;
+        border: 2px solid #334155;
+        border-radius: 4px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-family: 'Digital-7', monospace;
+        font-size: 70px;
+        color: #ff9900;
+    }
+    .separator { font-size: 50px; font-weight: bold; color: #ff9900; }
+
+    /* その他UI */
     .control-row { margin-bottom: 20px; }
     .control-btn { background: #1e293b; padding: 12px 24px; border: none; border-radius: 8px; color: white; cursor: pointer; margin: 0 5px; }
-    
     #inputPreview { font-size: 32px; color: #94a3b8; margin-bottom: 10px; font-family: monospace; }
-    
     .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 220px; margin: 0 auto; }
     button { padding: 15px; font-size: 18px; border: none; border-radius: 8px; cursor: pointer; background: #334155; color: white; }
     button:active { transform: scale(0.95); }
@@ -27,7 +48,13 @@
 <body>
 
 <div class="container">
-    <div id="display">00:00:00</div>
+    <div id="display">
+        <div class="digit-box" id="h1">0</div><div class="digit-box" id="h2">0</div>
+        <span class="separator">:</span>
+        <div class="digit-box" id="m1">0</div><div class="digit-box" id="m2">0</div>
+        <span class="separator">:</span>
+        <div class="digit-box" id="s1">0</div><div class="digit-box" id="s2">0</div>
+    </div>
     
     <div id="uiArea" style="display: none;">
         <div class="control-row">
@@ -56,13 +83,7 @@
     
     let conn, time = 0, timer = null, inputBuffer = "";
 
-    // 操作エリアを表示する関数
-    function showControls() {
-        if (role === 'master') {
-            document.getElementById('uiArea').style.display = 'block';
-        }
-    }
-
+    function showControls() { if (role === 'master') document.getElementById('uiArea').style.display = 'block'; }
     function press(n) { if(inputBuffer.length < 6) { inputBuffer += n; updatePreview(); } }
     function clearInput() { inputBuffer = ""; updatePreview(); }
     function updatePreview() {
@@ -73,21 +94,19 @@
     function setTimer() {
         if(inputBuffer.length === 0) return;
         const total = parseInt(inputBuffer.padStart(6, '0'));
-        const h = Math.floor(total / 10000);
-        const m = Math.floor((total % 10000) / 100);
-        const s = total % 100;
-        time = h * 3600 + m * 60 + s;
+        time = Math.floor(total/10000)*3600 + Math.floor((total%10000)/100)*60 + (total%100);
         updateDisplay();
         inputBuffer = ""; updatePreview();
         if (conn) conn.send({type: 'time', value: time});
     }
 
     function updateDisplay() {
-        const h = Math.floor(time / 3600);
-        const m = Math.floor((time % 3600) / 60);
-        const s = time % 60;
-        document.getElementById('display').innerText = 
-            String(h).padStart(2, '0') + ":" + String(m).padStart(2, '0') + ":" + String(s).padStart(2, '0');
+        const h = String(Math.floor(time / 3600)).padStart(2, '0');
+        const m = String(Math.floor((time % 3600) / 60)).padStart(2, '0');
+        const s = String(time % 60).padStart(2, '0');
+        document.getElementById('h1').innerText = h[0]; document.getElementById('h2').innerText = h[1];
+        document.getElementById('m1').innerText = m[0]; document.getElementById('m2').innerText = m[1];
+        document.getElementById('s1').innerText = s[0]; document.getElementById('s2').innerText = s[1];
     }
 
     function toggleTimer() {
@@ -106,7 +125,7 @@
     function connectToMaster() {
         setStatus("CONNECTING...", "status-connecting");
         conn = peer.connect(MASTER_ID);
-        conn.on('open', () => { setStatus("CONNECTED", "status-connected"); /* 子機は controls を表示しない */ });
+        conn.on('open', () => { setStatus("CONNECTED", "status-connected"); });
         conn.on('data', data => { if(data.type === 'time') { time = data.value; updateDisplay(); } });
         conn.on('close', () => { setStatus("UNLINK", "status-unlink"); setTimeout(connectToMaster, 3000); });
     }
@@ -114,7 +133,7 @@
     peer.on('open', () => { if(role === 'slave') connectToMaster(); });
     peer.on('connection', c => {
         conn = c; 
-        showControls(); // 親機だけ操作エリアが出る
+        showControls();
         setStatus("CONNECTED", "status-connected");
         c.on('data', data => { if(data.type === 'time') { time = data.value; updateDisplay(); } });
     });
