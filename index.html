@@ -56,12 +56,7 @@
     
     let conn, time = 0, timer = null, inputBuffer = "";
 
-    // 操作エリアを表示する関数
-    function showControls() {
-        if (role === 'master') {
-            document.getElementById('uiArea').style.display = 'block';
-        }
-    }
+    function showControls() { if (role === 'master') document.getElementById('uiArea').style.display = 'block'; }
 
     function press(n) { if(inputBuffer.length < 6) { inputBuffer += n; updatePreview(); } }
     function clearInput() { inputBuffer = ""; updatePreview(); }
@@ -82,10 +77,14 @@
         if (conn) conn.send({type: 'time', value: time});
     }
 
-    function updateDisplay() {
-        const h = Math.floor(time / 3600);
-        const m = Math.floor((time % 3600) / 60);
-        const s = time % 60;
+    function updateDisplay(isSlave = false, rawTime = time) {
+        // 子機の場合は1秒足して表示
+        let displayTime = isSlave ? (rawTime + 1) : rawTime;
+        
+        const h = Math.floor(displayTime / 3600);
+        const m = Math.floor((displayTime % 3600) / 60);
+        const s = displayTime % 60;
+        
         document.getElementById('display').innerText = 
             String(h).padStart(2, '0') + ":" + String(m).padStart(2, '0') + ":" + String(s).padStart(2, '0');
     }
@@ -106,15 +105,20 @@
     function connectToMaster() {
         setStatus("CONNECTING...", "status-connecting");
         conn = peer.connect(MASTER_ID);
-        conn.on('open', () => { setStatus("CONNECTED", "status-connected"); /* 子機は controls を表示しない */ });
-        conn.on('data', data => { if(data.type === 'time') { time = data.value; updateDisplay(); } });
+        conn.on('open', () => { setStatus("CONNECTED", "status-connected"); });
+        conn.on('data', data => { 
+            if(data.type === 'time') {
+                // 子機側：0.8秒(800ms)遅らせてから1秒足した時間を表示
+                setTimeout(() => updateDisplay(true, data.value), 800);
+            }
+        });
         conn.on('close', () => { setStatus("UNLINK", "status-unlink"); setTimeout(connectToMaster, 3000); });
     }
 
     peer.on('open', () => { if(role === 'slave') connectToMaster(); });
     peer.on('connection', c => {
         conn = c; 
-        showControls(); // 親機だけ操作エリアが出る
+        showControls();
         setStatus("CONNECTED", "status-connected");
         c.on('data', data => { if(data.type === 'time') { time = data.value; updateDisplay(); } });
     });
