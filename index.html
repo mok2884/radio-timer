@@ -3,10 +3,23 @@
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-    body { margin: 0; font-family: sans-serif; background: #0f172a; color: #e2e8f0; display: flex; justify-content: center; align-items: center; height: 100vh; flex-direction: column; }
+    body { margin: 0; font-family: sans-serif; background: #0f172a; color: #e2e8f0; display: flex; justify-content: center; align-items: center; height: 100vh; flex-direction: column; transition: background 0.5s; }
+    
+    /* 子機用の特別なデザイン */
+    body.is-slave { background: #000; }
+    body.is-slave #display { color: #00ff00; text-shadow: 0 0 10px #00ff40; }
+
     .container { text-align: center; }
     
-    #display { font-size: 80px; font-weight: bold; margin-bottom: 20px; font-family: monospace; }
+    /* 数字の幅を固定（tabular-nums）してガタつきを防ぐ */
+    #display { 
+        font-size: 100px; 
+        font-weight: bold; 
+        margin-bottom: 20px; 
+        font-family: 'Courier New', monospace; 
+        font-variant-numeric: tabular-nums;
+        letter-spacing: 5px;
+    }
     
     .control-row { margin-bottom: 20px; }
     .control-btn { background: #1e293b; padding: 12px 24px; border: none; border-radius: 8px; color: white; cursor: pointer; margin: 0 5px; }
@@ -56,6 +69,9 @@
     
     let conn, time = 0, timer = null, inputBuffer = "";
 
+    // 子機なら特別なデザインを適用
+    if (role === 'slave') document.body.classList.add('is-slave');
+
     function showControls() { if (role === 'master') document.getElementById('uiArea').style.display = 'block'; }
 
     function press(n) { if(inputBuffer.length < 6) { inputBuffer += n; updatePreview(); } }
@@ -78,9 +94,7 @@
     }
 
     function updateDisplay(isSlave = false, rawTime = time) {
-        // 子機の場合は1秒足して表示
         let displayTime = isSlave ? (rawTime + 1) : rawTime;
-        
         const h = Math.floor(displayTime / 3600);
         const m = Math.floor((displayTime % 3600) / 60);
         const s = displayTime % 60;
@@ -108,7 +122,6 @@
         conn.on('open', () => { setStatus("CONNECTED", "status-connected"); });
         conn.on('data', data => { 
             if(data.type === 'time') {
-                // 子機側：0.8秒(800ms)遅らせてから1秒足した時間を表示
                 setTimeout(() => updateDisplay(true, data.value), 800);
             }
         });
