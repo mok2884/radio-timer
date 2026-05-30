@@ -3,112 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Professional Slave Timer</title>
+    <title>Professional Timer</title>
     <link href="https://fonts.cdnfonts.com/css/ds-digital" rel="stylesheet">
     <style>
         body { margin: 0; background: #000; color: #ff4500; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; font-family: 'DS-Digital', monospace; }
 
-        /* 業務用ストップウォッチ風：数字の固定枠レイアウト */
+        /* 業務用ストップウォッチの表示エリア */
         #display {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 4px solid #FFFFFF;
-            border-radius: 20px;
-            padding: 35px 55px;
-            background: rgba(255, 255, 255, 0.05);
+            display: flex; align-items: center; justify-content: center;
+            border: 4px solid #FFFFFF; border-radius: 20px;
+            padding: 35px 55px; background: rgba(255, 255, 255, 0.05);
+            margin-bottom: 30px;
         }
+        .digit { width: 80px; text-align: center; font-size: 11rem; color: #ff4500; text-shadow: 0 0 15px #ff4500; }
+        .separator { width: 40px; text-align: center; font-size: 8rem; color: #ff4500; margin: 0 10px; }
 
-        .digit-group { display: flex; align-items: center; }
-        
-        .digit {
-            width: 80px;
-            text-align: center;
-            display: inline-block;
-            font-size: 11rem;
-            color: #ff4500;
-            text-shadow: 0 0 15px #ff4500;
-        }
+        /* 操作パネルエリア（親機のみ表示） */
+        #uiArea { width: 300px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        button { padding: 15px; font-size: 18px; background: #334155; color: white; border: none; border-radius: 8px; cursor: pointer; }
 
-        .separator {
-            width: 40px;
-            text-align: center;
-            font-size: 8rem;
-            color: #ff4500;
-            margin: 0 10px;
-        }
-
-        /* 親機専用：コントロールエリア */
-        #uiArea { margin-top: 50px; text-align: center; }
-        button { padding: 20px 40px; font-size: 24px; background: #333; color: white; border: none; border-radius: 10px; cursor: pointer; }
+        /* ステータス表示 */
+        #status { position: fixed; bottom: 20px; right: 20px; color: #fff; font-size: 12px; }
     </style>
 </head>
 <body>
 
 <div id="display">
-    <div class="digit-group">
-        <span class="digit" id="h1">0</span><span class="digit" id="h2">0</span>
-        <span class="separator">:</span>
-        <span class="digit" id="m1">0</span><span class="digit" id="m2">0</span>
-        <span class="separator">:</span>
-        <span class="digit" id="s1">0</span><span class="digit" id="s2">0</span>
-    </div>
+    <span class="digit" id="h1">0</span><span class="digit" id="h2">0</span>
+    <span class="separator">:</span>
+    <span class="digit" id="m1">0</span><span class="digit" id="m2">0</span>
+    <span class="separator">:</span>
+    <span class="digit" id="s1">0</span><span class="digit" id="s2">0</span>
 </div>
 
 <div id="uiArea" style="display: none;">
-    <button onclick="toggleTimer()">START / STOP</button>
+    <button onclick="toggleTimer()" id="toggleBtn" style="grid-column: span 2;">START</button>
+    <button onclick="resetTimer()">RESET</button>
+    <button onclick="press(1)">1</button><button onclick="press(2)">2</button><button onclick="press(3)">3</button>
+    <button onclick="press(4)">4</button><button onclick="press(5)">5</button><button onclick="press(6)">6</button>
+    <button onclick="press(7)">7</button><button onclick="press(8)">8</button><button onclick="press(9)">9</button>
+    <button onclick="clearInput()">CLR</button><button onclick="press(0)">0</button><button onclick="setTimer()">SET</button>
 </div>
+
+<div id="status">UNLINK</div>
 
 <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script>
     const role = new URLSearchParams(window.location.search).get('role');
     const MASTER_ID = 'radio-secret-id-998877665544332211';
     const peer = new Peer(role === 'master' ? MASTER_ID : null);
-    let conn, time = 0, timer = null;
+    let conn, time = 0, timer = null, inputBuffer = "";
 
-    if (role === 'master') document.getElementById('uiArea').style.display = 'block';
+    // 初期化と表示制御
+    if (role === 'master') document.getElementById('uiArea').style.display = 'grid';
 
     function updateDisplayView(t) {
-        const h = Math.floor(t / 3600);
-        const m = Math.floor((t % 3600) / 60);
-        const s = t % 60;
-        
-        const str = String(h).padStart(2, '0') + String(m).padStart(2, '0') + String(s).padStart(2, '0');
-        document.getElementById('h1').innerText = str[0];
-        document.getElementById('h2').innerText = str[1];
-        document.getElementById('m1').innerText = str[2];
-        document.getElementById('m2').innerText = str[3];
-        document.getElementById('s1').innerText = str[4];
-        document.getElementById('s2').innerText = str[5];
+        const str = String(Math.floor(t/3600)).padStart(2,'0') + 
+                    String(Math.floor((t%3600)/60)).padStart(2,'0') + 
+                    String(t%60).padStart(2,'0');
+        ['h1','h2','m1','m2','s1','s2'].forEach((id, i) => document.getElementById(id).innerText = str[i]);
     }
+
+    function press(n) { if(inputBuffer.length < 6) inputBuffer += n; }
+    function clearInput() { inputBuffer = ""; }
+    function setTimer() { time = parseInt(inputBuffer || 0); updateDisplayView(time); inputBuffer = ""; if(conn) conn.send({type:'time', value:time}); }
 
     function toggleTimer() {
         if (timer) { clearInterval(timer); timer = null; }
         else {
-            timer = setInterval(() => {
-                time++;
-                updateDisplayView(time);
-                if (conn) conn.send({type: 'time', value: time});
-            }, 1000);
+            timer = setInterval(() => { time++; updateDisplayView(time); if(conn) conn.send({type:'time', value:time}); }, 1000);
         }
     }
 
-    // 接続処理
+    function resetTimer() { clearInterval(timer); timer = null; time = 0; updateDisplayView(time); if(conn) conn.send({type:'time', value:time}); }
+
     peer.on('open', () => { if(role === 'slave') connectToMaster(); });
     
     function connectToMaster() {
         conn = peer.connect(MASTER_ID);
+        conn.on('open', () => document.getElementById('status').innerText = "CONNECTED");
         conn.on('data', data => {
-            if(data.type === 'time') {
-                // 林さんのこだわり：1秒足して800ms遅らせる
-                setTimeout(() => updateDisplayView(data.value + 1), 800);
-            }
+            if(data.type === 'time') setTimeout(() => updateDisplayView(data.value + 1), 800);
         });
-        conn.on('close', () => setTimeout(connectToMaster, 3000));
+        conn.on('close', () => { document.getElementById('status').innerText = "UNLINK"; setTimeout(connectToMaster, 3000); });
     }
 
     peer.on('connection', c => {
         conn = c;
+        document.getElementById('status').innerText = "CONNECTED";
         c.on('data', data => { if(data.type === 'time') updateDisplayView(data.value); });
     });
 </script>
