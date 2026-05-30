@@ -47,13 +47,11 @@
 <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script>
     const role = new URLSearchParams(window.location.search).get('role');
-    // IDはここを長くて複雑なものに書き換えてね！
     const MASTER_ID = 'radio-secret-id-998877665544332211'; 
     const peer = new Peer(role === 'master' ? MASTER_ID : null);
     
     let conn, time = 0, timer = null, inputBuffer = "";
 
-    // テンキー操作
     function press(n) { if(inputBuffer.length < 4) { inputBuffer += n; updatePreview(); } }
     function clearInput() { inputBuffer = ""; updatePreview(); }
     function updatePreview() {
@@ -72,7 +70,6 @@
         if (conn) conn.send({type: 'time', value: time});
     }
 
-    // タイマー操作
     function updateDisplay() {
         const m = Math.floor(time / 60);
         const s = time % 60;
@@ -84,9 +81,11 @@
             clearInterval(timer); timer = null;
             document.getElementById('toggleBtn').innerText = "START";
         } else {
+            // ここでカウントアップに戻したよ！
             timer = setInterval(() => {
-                if (time > 0) { time--; updateDisplay(); if (conn) conn.send({type: 'time', value: time}); }
-                else { clearInterval(timer); timer = null; document.getElementById('toggleBtn').innerText = "START"; }
+                time++;
+                updateDisplay();
+                if (conn) conn.send({type: 'time', value: time});
             }, 1000);
             document.getElementById('toggleBtn').innerText = "STOP";
         }
@@ -98,7 +97,6 @@
         if (conn) conn.send({type: 'time', value: time});
     }
 
-    // 通信管理
     const statusEl = document.getElementById('status');
     function setStatus(text, className) { statusEl.innerText = text; statusEl.className = className; }
 
