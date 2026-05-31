@@ -173,15 +173,21 @@ function updateDisplay() {
         setStatus("CONNECTED", "status-connected");
         c.on('data', data => { if(data.type === 'time') { time = data.value; updateDisplay(); } });
     });
-  if(role === 'slave'){
-    document.body.style.transform = 'rotate(90deg)';
-    document.body.style.transformOrigin = 'center center';
+ if(role === 'slave'){
 
-const status = document.getElementById('status');
+    const display = document.getElementById('display');
+
+    display.style.transform = 'rotate(90deg)';
+    display.style.transformOrigin = 'center center';
+
+    const status = document.getElementById('status');
+
+    status.style.transform = 'rotate(90deg)';
+    status.style.transformOrigin = 'center center';
 
     status.style.position = 'fixed';
-    status.style.top = '20px';
-    status.style.left = '20px';
+    status.style.top = '40px';
+    status.style.left = '40px';
 
     status.style.right = 'auto';
     status.style.bottom = 'auto';
