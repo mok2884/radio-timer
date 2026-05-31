@@ -176,7 +176,17 @@ function updateDisplay() {
   if(role === 'slave'){
     document.body.style.transform = 'rotate(90deg)';
     document.body.style.transformOrigin = 'center center';
+
+const status = document.getElementById('status');
+
+    status.style.position = 'fixed';
+    status.style.top = '20px';
+    status.style.left = '20px';
+
+    status.style.right = 'auto';
+    status.style.bottom = 'auto';
 }
+      
 </script>
 </body>
 </html>
