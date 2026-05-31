@@ -142,10 +142,12 @@
     try {
         if ('wakeLock' in navigator) {
             wakeLock = await navigator.wakeLock.request('screen');
+
+            wakeLock.addEventListener('release', () => {
+                wakeLock = null;
+            });
         }
-    } catch (err) {
-        console.log(err);
-    }
+    } catch (e) {}
 }
 
 function updateDisplay() {
@@ -216,10 +218,9 @@ status.style.left = '-20px';
 
    
 }
-      document.addEventListener('pointerdown', () => {
-    if (!wakeLock) keepScreenAwake();
-}, { once: true });
-
+     document.addEventListener('pointerdown', () => {
+    keepScreenAwake();
+});
 document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') {
         keepScreenAwake();
