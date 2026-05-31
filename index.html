@@ -110,6 +110,7 @@
     const peer = new Peer(role === 'master' ? MASTER_ID : null);
     
     let conn, time = 0, timer = null, inputBuffer = "";
+    let wakeLock = null;
 
     // 操作エリアを表示する関数
     function showControls() {
@@ -137,7 +138,15 @@
         if (conn) conn.send({type: 'time', value: time});
     }
 
-  
+  async function keepScreenAwake() {
+    try {
+        if ('wakeLock' in navigator) {
+            wakeLock = await navigator.wakeLock.request('screen');
+        }
+    } catch (err) {
+        console.log(err);
+    }
+}
 
 function updateDisplay() {
 
@@ -207,7 +216,15 @@ status.style.left = '-20px';
 
    
 }
-      
+      document.addEventListener('pointerdown', () => {
+    if (!wakeLock) keepScreenAwake();
+}, { once: true });
+
+document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+        keepScreenAwake();
+    }
+});
 </script>
 </body>
 </html>
