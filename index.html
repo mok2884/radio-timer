@@ -180,7 +180,10 @@ function updateDisplay() {
         c.on('data', data => { if(data.type === 'time') { time = data.value; updateDisplay(); } });
     });
  if(role === 'slave'){
+const displayGroup = document.getElementById('displayGroup');
 
+displayGroup.style.transform = 'rotate(90deg)';
+displayGroup.style.transformOrigin = 'center center';
    
     const status = document.getElementById('status');
 status.style.width = '120px';
