@@ -173,6 +173,10 @@ function updateDisplay() {
         setStatus("CONNECTED", "status-connected");
         c.on('data', data => { if(data.type === 'time') { time = data.value; updateDisplay(); } });
     });
+  if(role === 'slave'){
+    document.body.style.transform = 'rotate(90deg)';
+    document.body.style.transformOrigin = 'center center';
+}
 </script>
 </body>
 </html>
