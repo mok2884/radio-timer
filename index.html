@@ -184,9 +184,6 @@
     const peer = new Peer(role === 'master' ? MASTER_ID : null);
     
     let conn, time = 0, timer = null, inputBuffer = "";
-    let slaveTimer = null;
-    let slaveRunning = false;
-    let syncCounter = 0;
     let wakeLock = null;
 
     // 操作エリアを表示する関数
@@ -212,11 +209,7 @@
         time = h * 3600 + m * 60 + s;
         updateDisplay();
         inputBuffer = ""; updatePreview();
-       if (conn) conn.send({
-    type: 'time',
-    value: time,
-    running: false
-});
+        if (conn) conn.send({type: 'time', value: time});
     }
 
   async function keepScreenAwake() {
@@ -250,45 +243,13 @@ function updateDisplay() {
 
     function toggleTimer() {
         if (timer) { clearInterval(timer); timer = null; document.getElementById('toggleBtn').innerText = "START"; }
-        else {syncCounter = 0;
-
-if (conn) conn.send({
-    type: 'time',
-    value: time,
-    running: true
-});
-
-            
-            timer = setInterval(() => {
-
-    time++;
-    updateDisplay();
-
-    syncCounter++;
-
-    if(syncCounter >= 5){
-
-        syncCounter = 0;
-
-        if (conn) conn.send({
-            type: 'time',
-            value: time,
-            running: true
-        });
-
-    }
-
-}, 1000);
+        else {
+            timer = setInterval(() => { time++; updateDisplay(); if (conn) conn.send({type: 'time', value: time}); }, 1000);
             document.getElementById('toggleBtn').innerText = "STOP";
         }
     }
 
-    function resetTimer() { clearInterval(timer); timer = null; time = 0; 
-                           updateDisplay(); document.getElementById('toggleBtn').innerText = "START"; if (conn) conn.send({
-    type: 'time',
-    value: time,
-    running: false
-}); }
+    function resetTimer() { clearInterval(timer); timer = null; time = 0; updateDisplay(); document.getElementById('toggleBtn').innerText = "START"; if (conn) conn.send({type: 'time', value: time}); }
 
     const statusEl = document.getElementById('status');
     function setStatus(text, className) { statusEl.innerText = text; statusEl.className = className; }
@@ -297,45 +258,7 @@ if (conn) conn.send({
         setStatus("CONNECTING...", "status-connecting");
         conn = peer.connect(MASTER_ID);
         conn.on('open', () => { setStatus("CONNECTED", "status-connected"); /* 子機は controls を表示しない */ });
-        conn.on('data', data => {
-
-    if(data.type === 'time') {
-
-        if(data.running){
-
-            slaveRunning = true;
-            
-            setTimeout(() => {
-
-    time = data.value + 1;
-    updateDisplay();
-
-    clearInterval(slaveTimer);
-
-    slaveTimer = setInterval(() => {
-
-        if(slaveRunning){
-            time++;
-            updateDisplay();
-        }
-
-    }, 1000);
-
-}, 880);
-
-        } else {
-            slaveRunning = false;
-
-            time = data.value;
-            updateDisplay();
-
-        }
-
-    }
-
-});
-
-        
+        conn.on('data', data => { if(data.type === 'time') { time = data.value; updateDisplay(); } });
         conn.on('close', () => { setStatus("UNLINK", "status-unlink"); setTimeout(connectToMaster, 3000); });
     }
 
@@ -344,29 +267,7 @@ if (conn) conn.send({
         conn = c; 
         showControls(); // 親機だけ操作エリアが出る
         setStatus("CONNECTED", "status-connected");
-        c.on('data', data => {
-
-    if(data.type === 'time') {
-
-        if(data.running){
-
-            setTimeout(() => {
-                time = data.value + 1;
-                updateDisplay();
-            }, 800);
-
-        } else {
-
-            time = data.value;
-            updateDisplay();
-
-        }
-
-    }
-
-});
-
-        
+        c.on('data', data => { if(data.type === 'time') { time = data.value; updateDisplay(); } });
     });
  if(role === 'slave'){
 const displayGroup = document.getElementById('displayGroup');
@@ -386,7 +287,6 @@ status.style.left = '-20px';
 
     status.style.right = 'auto';
     status.style.bottom = 'auto';
-     
 
    
 }
