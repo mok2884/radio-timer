@@ -182,13 +182,37 @@ function updateDisplay() {
     const statusEl = document.getElementById('status');
     function setStatus(text, className) { statusEl.innerText = text; statusEl.className = className; }
 
-    function connectToMaster() {
-        setStatus("CONNECTING...", "status-connecting");
-        conn = peer.connect(MASTER_ID);
-        conn.on('open', () => { setStatus("CONNECTED", "status-connected"); /* 子機は controls を表示しない */ });
-        conn.on('data', data => { if(data.type === 'time') { time = data.value; updateDisplay(); } });
-        conn.on('close', () => { setStatus("UNLINK", "status-unlink"); setTimeout(connectToMaster, 3000); });
-    }
+function connectToMaster() {
+    setStatus("CONNECTING...", "status-connecting");
+
+    conn = peer.connect(MASTER_ID);
+
+    let connectTimeout = setTimeout(() => {
+        if (!conn || !conn.open) {
+            try { conn.close(); } catch(e) {}
+            setStatus("RETRY...", "status-unlink");
+            setTimeout(connectToMaster, 2000);
+        }
+    }, 5000);
+
+    conn.on('open', () => {
+        clearTimeout(connectTimeout);
+        setStatus("CONNECTED", "status-connected");
+    });
+
+    conn.on('data', data => {
+        if (data.type === 'time') {
+            time = data.value;
+            updateDisplay();
+        }
+    });
+
+    conn.on('close', () => {
+        clearTimeout(connectTimeout);
+        setStatus("UNLINK", "status-unlink");
+        setTimeout(connectToMaster, 2000);
+    });
+}
 
     peer.on('open', () => { if(role === 'slave') connectToMaster(); });
     peer.on('connection', c => {
