@@ -186,6 +186,7 @@
     let conn, time = 0, timer = null, inputBuffer = "";
     let slaveTimer = null;
     let slaveRunning = false;
+    let syncCounter = 0;
     let wakeLock = null;
 
     // 操作エリアを表示する関数
@@ -249,13 +250,35 @@ function updateDisplay() {
 
     function toggleTimer() {
         if (timer) { clearInterval(timer); timer = null; document.getElementById('toggleBtn').innerText = "START"; }
-        else {
-            timer = setInterval(() => { time++; updateDisplay(); 
-                                       if (conn) conn.send({
+        else {syncCounter = 0;
+
+if (conn) conn.send({
     type: 'time',
     value: time,
     running: true
-}); }, 1000);
+});
+
+            
+            timer = setInterval(() => {
+
+    time++;
+    updateDisplay();
+
+    syncCounter++;
+
+    if(syncCounter >= 5){
+
+        syncCounter = 0;
+
+        if (conn) conn.send({
+            type: 'time',
+            value: time,
+            running: true
+        });
+
+    }
+
+}, 1000);
             document.getElementById('toggleBtn').innerText = "STOP";
         }
     }
