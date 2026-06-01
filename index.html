@@ -185,18 +185,14 @@ function updateDisplay() {
 function connectToMaster() {
     setStatus("CONNECTING...", "status-connecting");
 
+    if (conn) {
+        try { conn.close(); } catch(e) {}
+        conn = null;
+    }
+
     conn = peer.connect(MASTER_ID);
 
-    let connectTimeout = setTimeout(() => {
-        if (!conn || !conn.open) {
-            try { conn.close(); } catch(e) {}
-            setStatus("RETRY...", "status-unlink");
-            setTimeout(connectToMaster, 2000);
-        }
-    }, 5000);
-
     conn.on('open', () => {
-        clearTimeout(connectTimeout);
         setStatus("CONNECTED", "status-connected");
     });
 
@@ -208,9 +204,8 @@ function connectToMaster() {
     });
 
     conn.on('close', () => {
-        clearTimeout(connectTimeout);
         setStatus("UNLINK", "status-unlink");
-        setTimeout(connectToMaster, 2000);
+        setTimeout(connectToMaster, 3000);
     });
 }
 
