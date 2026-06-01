@@ -306,9 +306,22 @@ if (conn) conn.send({
             slaveRunning = true;
             
             setTimeout(() => {
-                time = data.value + 1;
-                updateDisplay();
-            }, 880);
+
+    time = data.value + 1;
+    updateDisplay();
+
+    clearInterval(slaveTimer);
+
+    slaveTimer = setInterval(() => {
+
+        if(slaveRunning){
+            time++;
+            updateDisplay();
+        }
+
+    }, 1000);
+
+}, 880);
 
         } else {
             slaveRunning = false;
@@ -373,14 +386,7 @@ status.style.left = '-20px';
 
     status.style.right = 'auto';
     status.style.bottom = 'auto';
-     slaveTimer = setInterval(() => {
-
-    if(slaveRunning){
-        time++;
-        updateDisplay();
-    }
-
-}, 1000);
+     
 
    
 }
