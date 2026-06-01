@@ -184,6 +184,7 @@
     const peer = new Peer(role === 'master' ? MASTER_ID : null);
     
     let conn, time = 0, timer = null, inputBuffer = "";
+    let slaveTimer = null;
     let wakeLock = null;
 
     // 操作エリアを表示する関数
@@ -345,6 +346,10 @@ status.style.left = '-20px';
 
     status.style.right = 'auto';
     status.style.bottom = 'auto';
+     slaveTimer = setInterval(() => {
+    time++;
+    updateDisplay();
+}, 1000);
 
    
 }
