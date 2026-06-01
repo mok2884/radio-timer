@@ -185,6 +185,7 @@
     
     let conn, time = 0, timer = null, inputBuffer = "";
     let slaveTimer = null;
+    let slaveRunning = false;
     let wakeLock = null;
 
     // 操作エリアを表示する関数
@@ -279,12 +280,15 @@ function updateDisplay() {
 
         if(data.running){
 
+            slaveRunning = true;
+            
             setTimeout(() => {
                 time = data.value + 1;
                 updateDisplay();
             }, 880);
 
         } else {
+            slaveRunning = false;
 
             time = data.value;
             updateDisplay();
@@ -347,8 +351,12 @@ status.style.left = '-20px';
     status.style.right = 'auto';
     status.style.bottom = 'auto';
      slaveTimer = setInterval(() => {
-    time++;
-    updateDisplay();
+
+    if(slaveRunning){
+        time++;
+        updateDisplay();
+    }
+
 }, 1000);
 
    
