@@ -110,8 +110,14 @@
     const display = document.getElementById('display');
 
     display.style.fontSize = '6rem';
-    display.style.padding = '10px 12px';
+    display.style.padding = '16px 20px';
     display.style.border = '3px solid #FFFFFF';
+        const digits = document.querySelectorAll('.digit');
+
+digits.forEach(d => {
+    d.style.width = '55px';
+    d.style.margin = '0 3px';
+});
 }
     const MASTER_ID = 'radio-secret-id-998877665544332211'; 
     const peer = new Peer(role === 'master' ? MASTER_ID : null);
