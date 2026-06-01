@@ -1,102 +1,43 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<link href="https://fonts.cdnfonts.com/css/ds-digital" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700;900&display=swap" rel="stylesheet">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
     body { margin: 0; font-family: sans-serif; background: #0f172a; color: #e2e8f0; display: flex; justify-content: center; align-items: center; height: 100vh; flex-direction: column; }
     .container { text-align: center; }
-    
-    #display {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    #display { font-size: 80px; font-weight: bold; margin-bottom: 5px; }
+    #inputPreview { font-size: 24px; color: #94a3b8; margin-bottom: 20px; height: 30px; }
 
-    font-size: 11rem;
-    font-family: 'DS-Digital', monospace;
-
-    border: 4px solid #FFFFFF;
-    border-radius: 20px;
-
-    padding: 35px 55px;
-    background: rgba(255,255,255,0.05);
-
-    margin-bottom: 20px;
-}
-.digit {
-    width: 80px;
-    text-align: right;
-    display: inline-block;
-    margin: 0 8px;
-    font-style: italic;
-    color: #ff4500;
-}
-
-.separator {
-    width: 45px;
-    text-align: center;
-    display: inline-block;
-    color: #ff0000;
-}
-    
-    .control-row { margin-bottom: 20px; }
-    .control-btn { background: #1e293b; padding: 12px 24px; border: none; border-radius: 8px; color: white; cursor: pointer; margin: 0 5px; }
-    
-    #inputPreview { font-size: 32px; color: #94a3b8; margin-bottom: 10px; font-family: monospace; }
-    
-    .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 220px; margin: 0 auto; }
-    button { padding: 15px; font-size: 18px; border: none; border-radius: 8px; cursor: pointer; background: #334155; color: white; }
+    .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; width: 200px; margin-left: auto; margin-right: auto; }
+    button { padding: 15px; font-size: 18px; border: none; border-radius: 8px; cursor: pointer; background: #334155; color: white; transition: 0.2s; }
     button:active { transform: scale(0.95); }
     .action-btn { background: #475569; }
+    .control-btn { background: #1e293b; padding: 12px 24px; }
 
     #status { position: fixed; bottom: 20px; right: 20px; font-size: 14px; font-weight: bold; padding: 5px 10px; border-radius: 5px; }
     .status-connected { color: #22c55e; border: 1px solid #22c55e; }
     .status-connecting { color: #eab308; border: 1px solid #eab308; }
     .status-unlink { color: #ef4444; border: 1px solid #ef4444; }
-#slaveLabel {
-    font-size: 34px;
-    font-weight: 900;
-    font-family: 'Roboto', sans-serif;
-}
-    
 </style>
 </head>
 <body>
 
 <div class="container">
-    <div id="displayGroup">
-   <div id="display">
-    <span class="digit">0</span>
-    <span class="digit">0</span>
-    <span class="separator">:</span>
-
-    <span class="digit">0</span>
-    <span class="digit">0</span>
-    <span class="separator">:</span>
-
-    <span class="digit">0</span>
-    <span class="digit">0</span>
-</div>
-<div id="slaveLabel">
-    REAL TIME / TIMER
-</div>
-        </div>
-
+    <div id="display">00:00</div>
+    <div id="inputPreview">--:--</div>
     
     <div id="uiArea" style="display: none;">
-        <div class="control-row">
-            <button onclick="toggleTimer()" id="toggleBtn" class="control-btn">START</button>
-            <button onclick="resetTimer()" class="control-btn">RESET</button>
-            <button onclick="setTimer()" class="control-btn" style="background:#0f766e;">SET</button>
-        </div>
-        <div id="inputPreview">--:--:--</div>
         <div class="keypad">
             <button onclick="press(1)">1</button><button onclick="press(2)">2</button><button onclick="press(3)">3</button>
             <button onclick="press(4)">4</button><button onclick="press(5)">5</button><button onclick="press(6)">6</button>
             <button onclick="press(7)">7</button><button onclick="press(8)">8</button><button onclick="press(9)">9</button>
             <button onclick="clearInput()" class="action-btn">CLR</button>
             <button onclick="press(0)">0</button>
+            <button onclick="setTimer()" class="action-btn">SET</button>
+        </div>
+        <div>
+            <button onclick="toggleTimer()" id="toggleBtn" class="control-btn">START</button>
+            <button onclick="resetTimer()" class="control-btn">RESET</button>
         </div>
     </div>
 </div>
@@ -110,72 +51,51 @@
     const peer = new Peer(role === 'master' ? MASTER_ID : null);
     
     let conn, time = 0, timer = null, inputBuffer = "";
-    let wakeLock = null;
 
-    // 操作エリアを表示する関数
-    function showControls() {
-        if (role === 'master') {
-            document.getElementById('uiArea').style.display = 'block';
-        }
-    }
-
-    function press(n) { if(inputBuffer.length < 6) { inputBuffer += n; updatePreview(); } }
+    function press(n) { if(inputBuffer.length < 4) { inputBuffer += n; updatePreview(); } }
     function clearInput() { inputBuffer = ""; updatePreview(); }
     function updatePreview() {
-        const d = inputBuffer.padStart(6, '0');
-        document.getElementById('inputPreview').innerText = d.slice(0,2) + ":" + d.slice(2,4) + ":" + d.slice(4,6);
+        const d = inputBuffer.padStart(4, '0');
+        document.getElementById('inputPreview').innerText = d.slice(0,2) + ":" + d.slice(2,4);
     }
 
     function setTimer() {
         if(inputBuffer.length === 0) return;
-        const total = parseInt(inputBuffer.padStart(6, '0'));
-        const h = Math.floor(total / 10000);
-        const m = Math.floor((total % 10000) / 100);
+        const total = parseInt(inputBuffer.padStart(4, '0'));
+        const m = Math.floor(total / 100);
         const s = total % 100;
-        time = h * 3600 + m * 60 + s;
+        time = m * 60 + s;
         updateDisplay();
         inputBuffer = ""; updatePreview();
         if (conn) conn.send({type: 'time', value: time});
     }
 
-  async function keepScreenAwake() {
-    try {
-        if ('wakeLock' in navigator) {
-            wakeLock = await navigator.wakeLock.request('screen');
-        }
-    } catch (err) {
-        console.log(err);
+    function updateDisplay() {
+        const m = Math.floor(time / 60);
+        const s = time % 60;
+        document.getElementById('display').innerText = String(m).padStart(2, '0') + ":" + String(s).padStart(2, '0');
     }
-}
-
-function updateDisplay() {
-
-    const h = Math.floor(time / 3600);
-    const m = Math.floor((time % 3600) / 60);
-    const s = time % 60;
-
-    const txt =
-        String(h).padStart(2,'0') +
-        String(m).padStart(2,'0') +
-        String(s).padStart(2,'0');
-
-    const digits =
-        document.querySelectorAll('#display .digit');
-
-    for(let i=0;i<6;i++){
-        digits[i].innerText = txt[i];
-    }
-}
 
     function toggleTimer() {
-        if (timer) { clearInterval(timer); timer = null; document.getElementById('toggleBtn').innerText = "START"; }
-        else {
-            timer = setInterval(() => { time++; updateDisplay(); if (conn) conn.send({type: 'time', value: time}); }, 1000);
+        if (timer) {
+            clearInterval(timer); timer = null;
+            document.getElementById('toggleBtn').innerText = "START";
+        } else {
+            // ここでカウントアップに戻したよ！
+            timer = setInterval(() => {
+                time++;
+                updateDisplay();
+                if (conn) conn.send({type: 'time', value: time});
+            }, 1000);
             document.getElementById('toggleBtn').innerText = "STOP";
         }
     }
 
-    function resetTimer() { clearInterval(timer); timer = null; time = 0; updateDisplay(); document.getElementById('toggleBtn').innerText = "START"; if (conn) conn.send({type: 'time', value: time}); }
+    function resetTimer() {
+        clearInterval(timer); timer = null; time = 0; updateDisplay();
+        document.getElementById('toggleBtn').innerText = "START";
+        if (conn) conn.send({type: 'time', value: time});
+    }
 
     const statusEl = document.getElementById('status');
     function setStatus(text, className) { statusEl.innerText = text; statusEl.className = className; }
@@ -183,48 +103,17 @@ function updateDisplay() {
     function connectToMaster() {
         setStatus("CONNECTING...", "status-connecting");
         conn = peer.connect(MASTER_ID);
-        conn.on('open', () => { setStatus("CONNECTED", "status-connected"); /* 子機は controls を表示しない */ });
+        conn.on('open', () => { setStatus("CONNECTED", "status-connected"); document.getElementById('uiArea').style.display = 'block'; });
         conn.on('data', data => { if(data.type === 'time') { time = data.value; updateDisplay(); } });
         conn.on('close', () => { setStatus("UNLINK", "status-unlink"); setTimeout(connectToMaster, 3000); });
     }
 
     peer.on('open', () => { if(role === 'slave') connectToMaster(); });
     peer.on('connection', c => {
-        conn = c; 
-        showControls(); // 親機だけ操作エリアが出る
+        conn = c; document.getElementById('uiArea').style.display = 'block';
         setStatus("CONNECTED", "status-connected");
         c.on('data', data => { if(data.type === 'time') { time = data.value; updateDisplay(); } });
     });
- if(role === 'slave'){
-const displayGroup = document.getElementById('displayGroup');
-
-displayGroup.style.transform = 'rotate(90deg)';
-displayGroup.style.transformOrigin = 'center center';
-   
-    const status = document.getElementById('status');
-status.style.width = '120px';
-status.style.textAlign = 'center';
-    status.style.transform = 'rotate(90deg)';
-    status.style.transformOrigin = 'center center';
-
-    status.style.position = 'fixed';
-status.style.top = '160px';
-status.style.left = '-20px';
-
-    status.style.right = 'auto';
-    status.style.bottom = 'auto';
-
-   
-}
-      document.addEventListener('pointerdown', () => {
-    if (!wakeLock) keepScreenAwake();
-}, { once: true });
-
-document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible') {
-        keepScreenAwake();
-    }
-});
 </script>
 </body>
 </html>
