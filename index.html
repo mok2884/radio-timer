@@ -195,7 +195,20 @@
         }
     }
 
-    function press(n) { if(inputBuffer.length < 6) { inputBuffer += n; updatePreview(); } }
+    function press(n) { 
+    // ここで inputBuffer.length が 0 なら、まず「何か入っている数字を消す」処理が必要かも
+    // でも一番簡単なのは、CLRを自動で挟むことかな。
+    
+    // 修正：数字を打ち始めたら、もしSET後の数字が残ってても上書きするようにする！
+    if (inputBuffer.length === 0 || document.getElementById('inputPreview').innerText !== "--:--:--") {
+        inputBuffer = ""; // 新しい入力のときは古い数字をクリア
+    }
+    
+    if(inputBuffer.length < 6) { 
+        inputBuffer += n; 
+        updatePreview(); 
+    } 
+}
     function clearInput() { inputBuffer = ""; updatePreview(); }
     function updatePreview() {
         const d = inputBuffer.padStart(6, '0');
@@ -210,8 +223,8 @@
         const s = total % 100;
         time = h * 3600 + m * 60 + s;
         updateDisplay();
-        inputBuffer = ""; updatePreview();
         if (conn) conn.send({type: 'time', value: time});
+
     }
 
   async function keepScreenAwake() {
