@@ -104,10 +104,11 @@
     color: white;
     border: none;
     border-radius: 8px;
-    padding: 10px 16px;
     cursor: pointer;
-    font-weight: bold;
-}    
+    font-weight: 900;
+    height: 75px;
+    font-size: 18px;
+}
     
 </style>
 </head>
@@ -137,7 +138,7 @@
        
                <div class="setRow">
     <div id="inputPreview">--:--:--</div>
-    <button onclick="setTimer()" class="setBtn">TIME SET</button>
+   
 </div>
 
         <div class="mainRow">
@@ -147,6 +148,7 @@
             <button onclick="press(7)">7</button><button onclick="press(8)">8</button><button onclick="press(9)">9</button>
             <button onclick="clearInput()" class="action-btn">CLR</button>
             <button onclick="press(0)">0</button>
+            <button onclick="setTimer()" class="setBtn">SET</button>
         </div>
 <div class="rightPanel">
     <button class="resetBtn" onclick="resetTimer()">RESET</button>
