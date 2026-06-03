@@ -196,11 +196,7 @@
     }
 
     function press(n) { if(inputBuffer.length < 6) { inputBuffer += n; updatePreview(); } }
-    function clearInput() {{ 
-    inputBuffer = ""; 
-    // ここで強制的に表示をリセットする
-    document.getElementById('inputPreview').innerText = "--:--:--";
-}
+    function clearInput() { inputBuffer = ""; updatePreview(); }
     function updatePreview() {
         const d = inputBuffer.padStart(6, '0');
         document.getElementById('inputPreview').innerText = d.slice(0,2) + ":" + d.slice(2,4) + ":" + d.slice(4,6);
@@ -214,7 +210,7 @@
         const s = total % 100;
         time = h * 3600 + m * 60 + s;
         updateDisplay();
-        // inputBuffer = ""; updatePreview();  <-- ここを // で無効化する
+        inputBuffer = ""; updatePreview();
         if (conn) conn.send({type: 'time', value: time});
     }
 
