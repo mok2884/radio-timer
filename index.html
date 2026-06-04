@@ -7,25 +7,7 @@
 <style>
     body { margin: 0; font-family: sans-serif; background: #0f172a; color: #e2e8f0; display: flex; justify-content: center; align-items: center; height: 100vh; flex-direction: column; }
     .container { text-align: center; }
-    #overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    background: rgba(0, 0, 0, 0.6);
-    color: white;
-
-    font-size: 28px;
-    font-weight: 900;
-
-    z-index: 999;
-}
+    
     #display {
     display: flex;
     align-items: center;
@@ -133,9 +115,6 @@
 <body>
 
 <div class="container">
-    <div id="overlay" onclick="startConnection()">
-    TAP TO CONNECT
-</div>
     <div id="displayGroup">
    <div id="display">
     <span class="digit">0</span>
@@ -309,10 +288,7 @@ function updateDisplay() {
 
     const statusEl = document.getElementById('status');
     function setStatus(text, className) { statusEl.innerText = text; statusEl.className = className; }
-function startConnection() {
-    document.getElementById('overlay').style.display = 'none';
-    connectToMaster();
-}
+
     function connectToMaster() {
         setStatus("CONNECTING...", "status-connecting");
         conn = peer.connect(MASTER_ID);
@@ -321,7 +297,7 @@ function startConnection() {
         conn.on('close', () => { setStatus("UNLINK", "status-unlink"); setTimeout(connectToMaster, 3000); });
     }
 
-    peer.on('open', () => {  });
+    peer.on('open', () => { if(role === 'slave') connectToMaster(); });
     peer.on('connection', c => {
         conn = c; 
         showControls(); // 親機だけ操作エリアが出る
