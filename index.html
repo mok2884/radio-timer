@@ -186,6 +186,8 @@
     const peer = new Peer(role === 'master' ? MASTER_ID : null);
     
     let conn, time = 0, timer = null, inputBuffer = "";
+let savedBuffer = "";
+let editing = false;
     let wakeLock = null;
 
     // 操作エリアを表示する関数
@@ -195,12 +197,41 @@
         }
     }
 
-    function press(n) { if(inputBuffer.length < 6) { inputBuffer += n; updatePreview(); } }
-    function clearInput() { inputBuffer = ""; updatePreview(); }
-    function updatePreview() {
-        const d = inputBuffer.padStart(6, '0');
-        document.getElementById('inputPreview').innerText = d.slice(0,2) + ":" + d.slice(2,4) + ":" + d.slice(4,6);
+   function press(n) {
+
+    if (!editing) {
+        inputBuffer = "";
+        editing = true;
     }
+
+    if (inputBuffer.length < 6) {
+        inputBuffer += n;
+        updatePreview();
+    }
+}
+    function clearInput() {
+    inputBuffer = "";
+    savedBuffer = "";
+    editing = false;
+    updatePreview();
+}
+   function updatePreview() {
+
+    const source =
+        inputBuffer !== ""
+            ? inputBuffer
+            : savedBuffer;
+
+    if (source === "") {
+        document.getElementById('inputPreview').innerText = "--:--:--";
+        return;
+    }
+
+    const d = source.padStart(6, '0');
+
+    document.getElementById('inputPreview').innerText =
+        d.slice(0,2) + ":" + d.slice(2,4) + ":" + d.slice(4,6);
+}
 
     function setTimer() {
         if(inputBuffer.length === 0) return;
@@ -210,7 +241,9 @@
         const s = total % 100;
         time = h * 3600 + m * 60 + s;
         updateDisplay();
-        inputBuffer = ""; updatePreview();
+        savedBuffer = inputBuffer;
+editing = false;
+updatePreview();
         if (conn) conn.send({type: 'time', value: time});
     }
 
