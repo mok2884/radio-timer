@@ -185,7 +185,7 @@
     const MASTER_ID = 'radio-secret-id-998877665544332211'; 
     const peer = new Peer(role === 'master' ? MASTER_ID : null);
     
-    let conn, time = 0, timer = null, inputBuffer = ""; let lastTime = Date.now();
+    let conn, time = 0, timer = null, inputBuffer = "";
 let savedBuffer = "";
 let editing = false;
     let wakeLock = null;
@@ -288,27 +288,12 @@ function updateDisplay() {
 
     const statusEl = document.getElementById('status');
     function setStatus(text, className) { statusEl.innerText = text; statusEl.className = className; }
-setInterval(() => {
-    if (!conn) return;
 
-    if (Date.now() - lastTime > 3000) {
-        setStatus("UNLINK", "status-unlink");
-    } else {
-        setStatus("CONNECTED", "status-connected");
-    }
-}, 1000);
     function connectToMaster() {
         setStatus("CONNECTING...", "status-connecting");
-        lastTime = Date.now();
         conn = peer.connect(MASTER_ID);
         conn.on('open', () => { setStatus("CONNECTED", "status-connected"); /* 子機は controls を表示しない */ });
-        conn.on('data', data => { 
-    if(data.type === 'time') {
-        time = data.value;
-        updateDisplay();
-        lastTime = Date.now();
-    }
-});
+        conn.on('data', data => { if(data.type === 'time') { time = data.value; updateDisplay(); } });
         conn.on('close', () => { setStatus("UNLINK", "status-unlink"); setTimeout(connectToMaster, 3000); });
     }
 
