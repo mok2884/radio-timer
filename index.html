@@ -113,9 +113,7 @@
 </style>
 </head>
 <body>
-<div style="padding: 40px; border: 4px solid #FFFFFF; border-radius: 20px; font-size: 50px; font-weight: 900; color: #FFFFFF; text-align: center; transform: rotate(0deg); background: rgba(0,0,0,0.2);">
-    TAP TO<br>CONNECT
-</div>
+
 <div class="container">
     <div id="displayGroup">
    <div id="display">
@@ -299,24 +297,14 @@ function updateDisplay() {
         conn.on('close', () => { setStatus("UNLINK", "status-unlink"); setTimeout(connectToMaster, 3000); });
     }
 
-    peer.on('open', () => {
-    if (role === 'slave') {
-        document.getElementById('connectOverlay').addEventListener('click', () => {
-            document.getElementById('connectOverlay').style.display = 'none';
-            connectToMaster();
-        }, { once: true });
-    }
-});
+    peer.on('open', () => { if(role === 'slave') connectToMaster(); });
     peer.on('connection', c => {
         conn = c; 
         showControls(); // 親機だけ操作エリアが出る
         setStatus("CONNECTED", "status-connected");
         c.on('data', data => { if(data.type === 'time') { time = data.value; updateDisplay(); } });
     });
- if(role === 'master') {
-    document.getElementById('connectOverlay').style.display = 'none';
-}
-    if(role === 'slave'){
+ if(role === 'slave'){
 const displayGroup = document.getElementById('displayGroup');
 
 displayGroup.style.transform = 'rotate(90deg)';
@@ -334,9 +322,7 @@ status.style.left = '-20px';
 
     status.style.right = 'auto';
     status.style.bottom = 'auto';
-const overlay = document.getElementById('connectOverlay');
-overlay.style.transform = 'rotate(90deg)';
-overlay.style.transformOrigin = 'center center';
+
    
 }
       document.addEventListener('pointerdown', () => {
