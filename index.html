@@ -38,6 +38,7 @@
     text-align: center;
     display: inline-block;
     color: #ff0000;
+    font-size: 0.8em;
 }
     
     .control-row { margin-bottom: 20px; }
@@ -45,12 +46,43 @@
     
     #inputPreview { font-size: 32px; color: #94a3b8; margin-bottom: 10px; font-family: monospace; }
     
-    .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 220px; margin: 0 auto; }
+    .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 280px; margin: 0 auto; }
     button { padding: 15px; font-size: 18px; border: none; border-radius: 8px; cursor: pointer; background: #334155; color: white; }
     button:active { transform: scale(0.95); }
     .action-btn { background: #475569; }
 
-    #status { position: fixed; bottom: 20px; right: 20px; font-size: 14px; font-weight: bold; padding: 5px 10px; border-radius: 5px; }
+    #status { position: fixed; bottom: 20px; 
+             right: 20px; font-size: 14px; font-weight: bold; padding: 5px 10px; border-radius: 5px; }
+
+
+    .mainRow {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+}
+
+.rightPanel {
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    margin-left: -2px;
+}
+.keypad button{
+    font-size: 24px; font-weight: 900;
+    height: 75px;
+}
+.resetBtn {
+    height: 75px; background: #556577;
+    color: white;
+    font-weight: 900;
+}
+
+.startBtn {
+    height: 225px; /* 75px × 3段分 */
+    background: #f8f8f4;
+    color: #000;
+    font-weight: 900;
+}
     .status-connected { color: #22c55e; border: 1px solid #22c55e; }
     .status-connecting { color: #eab308; border: 1px solid #eab308; }
     .status-unlink { color: #ef4444; border: 1px solid #ef4444; }
@@ -58,6 +90,24 @@
     font-size: 34px;
     font-weight: 900;
     font-family: 'Roboto', sans-serif;
+}
+.setRow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.setBtn {
+    background: #0f766e;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 900;
+    height: 75px;
+    font-size: 18px;
 }
     
 </style>
@@ -85,19 +135,28 @@
 
     
     <div id="uiArea" style="display: none;">
-        <div class="control-row">
-            <button onclick="toggleTimer()" id="toggleBtn" class="control-btn">START</button>
-            <button onclick="resetTimer()" class="control-btn">RESET</button>
-            <button onclick="setTimer()" class="control-btn" style="background:#0f766e;">SET</button>
-        </div>
-        <div id="inputPreview">--:--:--</div>
+       
+               <div class="setRow">
+    <div id="inputPreview">--:--:--</div>
+   
+</div>
+
+        <div class="mainRow">
         <div class="keypad">
             <button onclick="press(1)">1</button><button onclick="press(2)">2</button><button onclick="press(3)">3</button>
             <button onclick="press(4)">4</button><button onclick="press(5)">5</button><button onclick="press(6)">6</button>
             <button onclick="press(7)">7</button><button onclick="press(8)">8</button><button onclick="press(9)">9</button>
             <button onclick="clearInput()" class="action-btn">CLR</button>
             <button onclick="press(0)">0</button>
+            <button onclick="setTimer()" class="setBtn" style="font-size: 16px;">TIME SET</button>
         </div>
+<div class="rightPanel">
+    <button class="resetBtn" onclick="resetTimer()">set ZERO</button>
+    <button class="startBtn" onclick="toggleTimer()">START / STOP</button>
+</div>
+</div>
+
+            
     </div>
 </div>
 
@@ -116,7 +175,7 @@
     const digits = document.querySelectorAll('.digit');
     digits.forEach(d => {
         d.style.width = '50px';
-        d.style.margin = '0 3px';
+        d.style.margin = '0 5px';
     });
 
     document.querySelectorAll('.separator').forEach(s => {
@@ -127,6 +186,8 @@
     const peer = new Peer(role === 'master' ? MASTER_ID : null);
     
     let conn, time = 0, timer = null, inputBuffer = "";
+let savedBuffer = "";
+let editing = false;
     let wakeLock = null;
 
     // 操作エリアを表示する関数
@@ -136,12 +197,41 @@
         }
     }
 
-    function press(n) { if(inputBuffer.length < 6) { inputBuffer += n; updatePreview(); } }
-    function clearInput() { inputBuffer = ""; updatePreview(); }
-    function updatePreview() {
-        const d = inputBuffer.padStart(6, '0');
-        document.getElementById('inputPreview').innerText = d.slice(0,2) + ":" + d.slice(2,4) + ":" + d.slice(4,6);
+   function press(n) {
+
+    if (!editing) {
+        inputBuffer = "";
+        editing = true;
     }
+
+    if (inputBuffer.length < 6) {
+        inputBuffer += n;
+        updatePreview();
+    }
+}
+    function clearInput() {
+    inputBuffer = "";
+    savedBuffer = "";
+    editing = false;
+    updatePreview();
+}
+   function updatePreview() {
+
+    const source =
+        inputBuffer !== ""
+            ? inputBuffer
+            : savedBuffer;
+
+    if (source === "") {
+        document.getElementById('inputPreview').innerText = "--:--:--";
+        return;
+    }
+
+    const d = source.padStart(6, '0');
+
+    document.getElementById('inputPreview').innerText =
+        d.slice(0,2) + ":" + d.slice(2,4) + ":" + d.slice(4,6);
+}
 
     function setTimer() {
         if(inputBuffer.length === 0) return;
@@ -151,7 +241,9 @@
         const s = total % 100;
         time = h * 3600 + m * 60 + s;
         updateDisplay();
-        inputBuffer = ""; updatePreview();
+        savedBuffer = inputBuffer;
+editing = false;
+updatePreview();
         if (conn) conn.send({type: 'time', value: time});
     }
 
