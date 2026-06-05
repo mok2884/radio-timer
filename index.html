@@ -325,8 +325,7 @@ const displayGroup = document.getElementById('displayGroup');
 
 displayGroup.style.transform = 'rotate(90deg)';
 displayGroup.style.transformOrigin = 'center center';
-     const overlay = document.getElementById('tapToConnect');
-overlay.style.transform = 'none';
+     
 
    
     const status = document.getElementById('status');
@@ -342,7 +341,9 @@ status.style.left = '-20px';
     status.style.right = 'auto';
     status.style.bottom = 'auto';
 
-   
+   const tapText = document.getElementById('tapText');
+tapText.style.transform = 'rotate(90deg)';
+
 }
       document.addEventListener('pointerdown', () => {
     if (!wakeLock) keepScreenAwake();
