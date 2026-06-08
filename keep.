@@ -113,9 +113,14 @@
 </style>
 </head>
 <body>
-<div id="tapToConnect" style="position:fixed; inset: 0; background:rgba(15, 23, 42, 0.8); display:none; justify-content:center; align-items:center; z-index:9999; cursor:pointer; color:white; font-size:40px; font-weight:bold; transform: rotate(90deg);">
-    TAP TO CONNECT
+<div id="tapToConnect" style="position:fixed; inset:0; background:rgba(15, 23, 42, 0.8); display:none; justify-content:center; align-items:center; z-index:9999; cursor:pointer;">
+    
+    <div id="tapText" style="color:white; font-size:40px; font-weight:bold;">
+        TAP TO CONNECT
+    </div>
+
 </div>
+
 <div class="container">
     <div id="displayGroup">
    <div id="display">
@@ -320,6 +325,8 @@ const displayGroup = document.getElementById('displayGroup');
 
 displayGroup.style.transform = 'rotate(90deg)';
 displayGroup.style.transformOrigin = 'center center';
+     
+
    
     const status = document.getElementById('status');
 status.style.width = '120px';
@@ -334,7 +341,9 @@ status.style.left = '-20px';
     status.style.right = 'auto';
     status.style.bottom = 'auto';
 
-   
+   const tapText = document.getElementById('tapText');
+tapText.style.transform = 'rotate(90deg)';
+
 }
       document.addEventListener('pointerdown', () => {
     if (!wakeLock) keepScreenAwake();
