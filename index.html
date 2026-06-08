@@ -348,8 +348,13 @@ if (timer) return;
         const now = Date.now();
 
         if (now - lastSync > 5000) {
-            startTime = Date.now() - (data.value * 1000);
-            lastSync = now;
+            const expected = Date.now() - (data.value * 1000);
+const diff = expected - startTime;
+
+// 差が大きいときだけ補正
+if (Math.abs(diff) > 300) {
+    startTime += diff * 0.5;
+}
         }
 
     }
