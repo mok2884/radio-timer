@@ -340,12 +340,18 @@ if (timer) return;
         conn = peer.connect(MASTER_ID);
         conn.on('open', () => { setStatus("CONNECTED", "status-connected"); /* 子機は controls を表示しない */ });
         conn.on('data', data => 
+
 {
     if(data.type === 'time') {
-        time = data.value;
-        updateDisplay();
+
+        const now = Math.floor(Date.now() / 1000);
+        if (now % 5 === 0) {
+            startTime = Date.now() - (data.value * 1000);
+        }
+
     }
 });
+
 
         conn.on('close', () => { setStatus("UNLINK", "status-unlink"); setTimeout(connectToMaster, 3000); });
     }
