@@ -341,16 +341,20 @@ if (timer) return;
         conn.on('open', () => { setStatus("CONNECTED", "status-connected"); /* 子機は controls を表示しない */ });
         conn.on('data', data => 
 
+
 {
     if(data.type === 'time') {
 
-        const now = Math.floor(Date.now() / 1000);
-        if (now % 5 === 0) {
+        const now = Date.now();
+
+        if (now - lastSync > 5000) {
             startTime = Date.now() - (data.value * 1000);
+            lastSync = now;
         }
 
     }
 });
+
 
 
         conn.on('close', () => { setStatus("UNLINK", "status-unlink"); setTimeout(connectToMaster, 3000); });
@@ -372,7 +376,7 @@ if (timer) return;
         setStatus("CONNECTED", "status-connected");
         c.on('data', data => { if(data.type === 'time') { time = data.value; updateDisplay(); } });
     });
- if(role === 'slave'){
+ if(role === 'slave'){ tartTime = Date.now();  //
 const displayGroup = document.getElementById('displayGroup');
 
 displayGroup.style.transform = 'rotate(90deg)';
