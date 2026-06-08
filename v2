@@ -109,7 +109,12 @@
     height: 75px;
     font-size: 18px;
 }
-    
+    .disabled {
+    background: #334155 !important;
+    color: #94a3b8 !important;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
 </style>
 </head>
 <body>
@@ -242,6 +247,7 @@ let editing = false;
 }
 
     function setTimer() {
+        if (timer) return;
         if(inputBuffer.length === 0) return;
         const total = parseInt(inputBuffer.padStart(6, '0'));
         const h = Math.floor(total / 10000);
@@ -285,15 +291,35 @@ function updateDisplay() {
 }
 
     function toggleTimer() {
-        if (timer) { clearInterval(timer); timer = null; document.getElementById('toggleBtn').innerText = "START"; }
-        else {startTime = Date.now() - (time * 1000);
-            timer = setInterval(() => { time = Math.floor((Date.now() - startTime) / 1000); updateDisplay(); if (conn) conn.send({type: 'time', value: time}); }, 200);
-            document.getElementById('toggleBtn').innerText = "STOP";
-        }
+
+    const resetBtn = document.querySelector('.resetBtn');
+    const setBtn = document.querySelector('.setBtn');
+
+    if (timer) {
+        clearInterval(timer);
+        timer = null;
+
+        // ボタンを元に戻す
+        resetBtn.classList.remove('disabled');
+        setBtn.classList.remove('disabled');
+
+    } else {
+        startTime = Date.now() - (time * 1000);
+
+        timer = setInterval(() => {
+            time = Math.floor((Date.now() - startTime) / 1000);
+            updateDisplay();
+            if (conn) conn.send({type: 'time', value: time});
+        }, 200);
+
+        // ボタンを暗くする
+        resetBtn.classList.add('disabled');
+        setBtn.classList.add('disabled');
     }
+}
 
     function resetTimer() { 
-
+if (timer) return;
     clearInterval(timer);
     timer = null;
     time = 0;
