@@ -198,6 +198,7 @@
     const peer = new Peer(role === 'master' ? MASTER_ID : null);
     
     let conn, time = 0, timer = null, inputBuffer = "";
+    let seq = 0;
     let startTime = 0;
 let savedBuffer = "";
 let editing = false;
@@ -309,7 +310,8 @@ function updateDisplay() {
         timer = setInterval(() => {
             time = Math.floor((Date.now() - startTime) / 1000);
             updateDisplay();
-            if (conn) conn.send({type: 'time', value: time});
+            if (conn) conn.send({type: 'time', value: time, seq: seq++});
+
         }, 200);
 
         // ボタンを暗くする
@@ -342,16 +344,13 @@ if (timer) return;
        let lastUpdateTime = 0;
         let lastReceived = 0;
 
+let lastSeq = -1;
+
 conn.on('data', data => {
     if (data.type === 'time') {
+        if (data.seq < lastSeq) return;
+        lastSeq = data.seq;
 
-        // 明らかに古い値は無視（通信の逆転対策）
-        if (data.value < lastReceived && (Date.now() - lastUpdateTime) < 300) {
-            return;
-        }
-
-        lastReceived = data.value;
-        lastUpdateTime = Date.now();
         time = data.value;
         updateDisplay();
     }
