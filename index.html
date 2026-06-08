@@ -339,7 +339,17 @@ if (timer) return;
         setStatus("CONNECTING...", "status-connecting");
         conn = peer.connect(MASTER_ID);
         conn.on('open', () => { setStatus("CONNECTED", "status-connected"); /* 子機は controls を表示しない */ });
-        conn.on('data', data => { if(data.type === 'time') { time = data.value; updateDisplay(); } });
+        let lastReceived = 0;
+
+conn.on('data', data => {
+    if(data.type === 'time') {
+        if (data.value >= lastReceived) {
+            lastReceived = data.value;
+            time = data.value;
+            updateDisplay();
+        }
+    }
+});
         conn.on('close', () => { setStatus("UNLINK", "status-unlink"); setTimeout(connectToMaster, 3000); });
     }
 
