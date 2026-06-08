@@ -339,29 +339,7 @@ if (timer) return;
         setStatus("CONNECTING...", "status-connecting");
         conn = peer.connect(MASTER_ID);
         conn.on('open', () => { setStatus("CONNECTED", "status-connected"); /* 子機は controls を表示しない */ });
-        conn.on('data', data => 
-
-
-{
-    if(data.type === 'time') {
-
-        const now = Date.now();
-
-        if (now - lastSync > 5000) {
-            const expected = Date.now() - (data.value * 1000);
-const diff = expected - startTime;
-
-// 差が大きいときだけ補正
-if (Math.abs(diff) > 300) {
-    startTime += diff * 0.5;
-}
-        }
-
-    }
-});
-
-
-
+        conn.on('data', data => { if(data.type === 'time') { time = data.value; updateDisplay(); } });
         conn.on('close', () => { setStatus("UNLINK", "status-unlink"); setTimeout(connectToMaster, 3000); });
     }
 
@@ -381,7 +359,7 @@ if (Math.abs(diff) > 300) {
         setStatus("CONNECTED", "status-connected");
         c.on('data', data => { if(data.type === 'time') { time = data.value; updateDisplay(); } });
     });
- if(role === 'slave'){ tartTime = Date.now();  //
+ if(role === 'slave'){
 const displayGroup = document.getElementById('displayGroup');
 
 displayGroup.style.transform = 'rotate(90deg)';
@@ -415,14 +393,6 @@ document.addEventListener('visibilitychange', () => {
         keepScreenAwake();
     }
 });
-    // 子機が自走するループ
-setInterval(() => {
-    if (role === 'slave') {
-        time = Math.floor((Date.now() - startTime) / 1000);
-        updateDisplay();
-    }
-}, 200);
-``
 </script>
 </body>
 </html>
