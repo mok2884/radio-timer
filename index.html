@@ -292,7 +292,7 @@ function updateDisplay() {
         }
     }
 
-    function resetTimer() { clearInterval(timer); timer = null; time = 0; updateDisplay(); document.getElementById('toggleBtn').innerText = "START"; if (conn) conn.send({type: 'time', value: time}); }
+    function resetTimer() { clearInterval(timer); timer = null; time = 0; startTime = Date.now(); updateDisplay(); document.getElementById('toggleBtn').innerText = "START"; if (conn) conn.send({type: 'time', value: time}); }
 
     const statusEl = document.getElementById('status');
     function setStatus(text, className) { statusEl.innerText = text; statusEl.className = className; }
