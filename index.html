@@ -193,6 +193,7 @@
     const peer = new Peer(role === 'master' ? MASTER_ID : null);
     
     let conn, time = 0, timer = null, inputBuffer = "";
+    let startTime = 0;
 let savedBuffer = "";
 let editing = false;
     let wakeLock = null;
@@ -285,8 +286,8 @@ function updateDisplay() {
 
     function toggleTimer() {
         if (timer) { clearInterval(timer); timer = null; document.getElementById('toggleBtn').innerText = "START"; }
-        else {
-            timer = setInterval(() => { time++; updateDisplay(); if (conn) conn.send({type: 'time', value: time}); }, 1000);
+        else {startTime = Date.now() - (time * 1000);
+            timer = setInterval(() => { time = Math.floor((Date.now() - startTime) / 1000); updateDisplay(); if (conn) conn.send({type: 'time', value: time}); }, 1000);
             document.getElementById('toggleBtn').innerText = "STOP";
         }
     }
