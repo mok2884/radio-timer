@@ -339,7 +339,14 @@ if (timer) return;
         setStatus("CONNECTING...", "status-connecting");
         conn = peer.connect(MASTER_ID);
         conn.on('open', () => { setStatus("CONNECTED", "status-connected"); /* 子機は controls を表示しない */ });
-        conn.on('data', data => { if(data.type === 'time') { time = data.value; updateDisplay(); } });
+        conn.on('data', data => 
+{
+    if(data.type === 'time') {
+        time = data.value;
+        updateDisplay();
+    }
+});
+
         conn.on('close', () => { setStatus("UNLINK", "status-unlink"); setTimeout(connectToMaster, 3000); });
     }
 
@@ -393,6 +400,14 @@ document.addEventListener('visibilitychange', () => {
         keepScreenAwake();
     }
 });
+    // 子機が自走するループ
+setInterval(() => {
+    if (role === 'slave') {
+        time = Math.floor((Date.now() - startTime) / 1000);
+        updateDisplay();
+    }
+}, 200);
+``
 </script>
 </body>
 </html>
