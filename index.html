@@ -287,7 +287,7 @@ function updateDisplay() {
     function toggleTimer() {
         if (timer) { clearInterval(timer); timer = null; document.getElementById('toggleBtn').innerText = "START"; }
         else {startTime = Date.now() - (time * 1000);
-            timer = setInterval(() => { time = Math.floor((Date.now() - startTime) / 1000); updateDisplay(); if (conn) conn.send({type: 'time', value: time}); }, 1000);
+            timer = setInterval(() => { time = Math.floor((Date.now() - startTime) / 1000); updateDisplay(); if (conn) conn.send({type: 'time', value: time}); }, 200);
             document.getElementById('toggleBtn').innerText = "STOP";
         }
     }
