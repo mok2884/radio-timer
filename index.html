@@ -383,8 +383,12 @@ if(role === 'slave'){
     displayGroup.style.top = '50%';
     displayGroup.style.left = '50%';
 
-    displayGroup.style.transform =
-        'translate(-50%, -50%) rotate(90deg) scale(0.5)';
+    const isIphone = /iPhone/.test(navigator.userAgent);
+
+const scale = isIphone ? 0.6 : 0.8;
+
+displayGroup.style.transform =
+    `translate(-50%, -50%) rotate(90deg) scale(${scale})`;
 
     displayGroup.style.transformOrigin = 'center center';
 
