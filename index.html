@@ -5,8 +5,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700;900&display=swap" rel="stylesheet">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-    body { margin: 0; font-family: sans-serif; background: #0f172a; color: #e2e8f0; 
-          display: flex; justify-content: center; align-items: center; height: 100dvh; overflow: hidden; flex-direction: column; }
+    body { margin: 0; font-family: sans-serif; background: #0f172a; color: #e2e8f0; display: flex; justify-content: center; align-items: center; height: 100vh; flex-direction: column; }
     .container { text-align: center; }
     
     #display {
@@ -14,28 +13,28 @@
     align-items: center;
     justify-content: center;
 
-   font-size: 18vw;
+    font-size: 11rem;
     font-family: 'DS-Digital', monospace;
 
-    border: 2px solid #FFFFFF;
+    border: 4px solid #FFFFFF;
     border-radius: 20px;
 
-    padding: 10px 20px;
-
+    padding: 35px 55px;
     background: rgba(255,255,255,0.05);
 
-    margin-bottom: 8px;
+    margin-bottom: 20px;
 }
 .digit {
-    width: 34px;
+    width: 80px;
     text-align: right;
     display: inline-block;
-    margin: 0 4px;
+    margin: 0 8px;
     font-style: italic;
     color: #ff4500;
 }
+
 .separator {
-    width: auto;
+    width: 45px;
     text-align: center;
     display: inline-block;
     color: #ff0000;
@@ -52,15 +51,9 @@
     button:active { transform: scale(0.95); }
     .action-btn { background: #475569; }
 
-    #status {
-    font-size: 8px;
-    font-weight: bold;
-    padding: 2px 6px;
-    border-radius: 5px;
-    display: inline-block;
-    width: 70px;
-    text-align: center;
-}
+    #status { position: fixed; bottom: 20px; 
+             right: 20px; font-size: 14px; font-weight: bold; padding: 5px 10px; border-radius: 5px; }
+
 
     .mainRow {
     display: flex;
@@ -94,7 +87,7 @@
     .status-connecting { color: #eab308; border: 1px solid #eab308; }
     .status-unlink { color: #ef4444; border: 1px solid #ef4444; }
 #slaveLabel {
-    font-size: 14px;
+    font-size: 34px;
     font-weight: 900;
     font-family: 'Roboto', sans-serif;
 }
@@ -127,11 +120,8 @@
 <body>
 <div id="tapToConnect" style="position:fixed; inset:0; background:rgba(15, 23, 42, 0.8); display:none; justify-content:center; align-items:center; z-index:9999; cursor:pointer;">
     
-    <div id="tapText" style="color:white; font-size:16px; font-weight:bold;" text-align:center;">
-       
-<br>
-    <span style="font-size:16px;">MASTER READY → TAP</span> 
-
+    <div id="tapText" style="color:white; font-size:40px; font-weight:bold;">
+        TAP TO CONNECT
     </div>
 
 </div>
@@ -153,7 +143,6 @@
 <div id="slaveLabel">
     REAL TIME / TIMER
 </div>
-        <div id="status" class="status-unlink">UNLINK</div>
         </div>
 
     
@@ -183,7 +172,7 @@
     </div>
 </div>
 
-
+<div id="status" class="status-unlink">UNLINK</div>
 
 <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script>
@@ -204,14 +193,7 @@
     document.querySelectorAll('.separator').forEach(s => {
         s.style.width = '28px';
     });
-
-const container = document.querySelector('.container');
-    container.style.transform = 'scale(0.75)';
-    container.style.transformOrigin = 'center center';
 }
-
-        
-
     const MASTER_ID = 'radio-secret-id-Zyxw-Vuts-9821-Kjhl'; 
     const peer = new Peer(role === 'master' ? MASTER_ID : null);
     
@@ -392,43 +374,31 @@ conn.on('data', data => {
         setStatus("CONNECTED", "status-connected");
         c.on('data', data => { if(data.type === 'time') { time = data.value; updateDisplay(); } });
     });
-if(role === 'slave'){
+ if(role === 'slave'){
+const displayGroup = document.getElementById('displayGroup');
 
-    const displayGroup = document.getElementById('displayGroup');
+displayGroup.style.transform = 'rotate(90deg)';
+displayGroup.style.transformOrigin = 'center center';
+     
 
-    displayGroup.style.position = 'absolute';
-    displayGroup.style.top = '50%';
-    displayGroup.style.left = '50%';
+   
+    const status = document.getElementById('status');
+status.style.width = '120px';
+status.style.textAlign = 'center';
+    status.style.transform = 'rotate(90deg)';
+    status.style.transformOrigin = 'center center';
 
-    displayGroup.style.transform =
-        'translate(-50%, -50%) rotate(90deg) scale(0.6)';
+    status.style.position = 'fixed';
+status.style.top = '160px';
+status.style.left = '-20px';
 
-    displayGroup.style.transformOrigin = 'center center';
-const d = document.getElementById('display');
+    status.style.right = 'auto';
+    status.style.bottom = 'auto';
 
-// 子機だけ完全固定（既存CSSを全部上書き）
-d.style.fontSize = '80px';
-d.style.width = '274px';
-d.style.height = '95px';
-d.style.padding = '10px 40px';
-d.style.border = '2px solid #FFFFFF';
-d.style.display = 'flex';
-d.style.alignItems = 'center';
-d.style.justifyContent = 'center';
+   const tapText = document.getElementById('tapText');
+tapText.style.transform = 'rotate(90deg)';
 
-const digits = document.querySelectorAll('#display .digit');
-digits.forEach(x => {
-    x.style.width = '60px';
-    x.style.margin = '0 5px';
-    x.style.textAlign = 'right';
-});
-
-const seps = document.querySelectorAll('#display .separator');
-seps.forEach(x => {
-    x.style.width = '20px';
-});
 }
-
       document.addEventListener('pointerdown', () => {
     if (!wakeLock) keepScreenAwake();
 }, { once: true });
