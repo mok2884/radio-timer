@@ -375,30 +375,11 @@ conn.on('data', data => {
         setStatus("CONNECTED", "status-connected");
         c.on('data', data => { if(data.type === 'time') { time = data.value; updateDisplay(); } });
     });
- if(role === 'slave'){
-const displayGroup = document.getElementById('displayGroup');
+if (role === 'slave') {
+    const displayGroup = document.getElementById('displayGroup');
 
-displayGroup.style.transform = 'rotate(90deg)';
-displayGroup.style.transformOrigin = 'center center';
-     
-
-   
-    const status = document.getElementById('status');
-status.style.width = '120px';
-status.style.textAlign = 'center';
-    status.style.transform = 'rotate(90deg)';
-    status.style.transformOrigin = 'center center';
-
-    status.style.position = 'fixed';
-status.style.top = '160px';
-status.style.left = '-20px';
-
-    status.style.right = 'auto';
-    status.style.bottom = 'auto';
-
-   const tapText = document.getElementById('tapText');
-tapText.style.transform = 'rotate(90deg)';
-
+    displayGroup.style.transform = 'rotate(90deg)';
+    displayGroup.style.transformOrigin = 'center center';
 }
       document.addEventListener('pointerdown', () => {
     if (!wakeLock) keepScreenAwake();
