@@ -383,14 +383,8 @@ if(role === 'slave'){
     displayGroup.style.top = '50%';
     displayGroup.style.left = '50%';
 
-    const rect = displayGroup.getBoundingClientRect();
-const screenW = window.innerWidth;
-
-const scale = screenW / rect.height;
-
-displayGroup.style.transform =
-    `translate(-50%, -50%) rotate(90deg) scale(${scale})`;
-
+    displayGroup.style.transform =
+        'translate(-50%, -50%) rotate(90deg) scale(0.6)';
 
     displayGroup.style.transformOrigin = 'center center';
 
