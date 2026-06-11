@@ -404,7 +404,29 @@ if(role === 'slave'){
         'translate(-50%, -50%) rotate(90deg) scale(0.6)';
 
     displayGroup.style.transformOrigin = 'center center';
+const d = document.getElementById('display');
 
+// 子機だけ完全固定（既存CSSを全部上書き）
+d.style.fontSize = '80px';
+d.style.width = '340px';
+d.style.height = '120px';
+d.style.padding = '10px 40px';
+d.style.border = '2px solid #FFFFFF';
+d.style.display = 'flex';
+d.style.alignItems = 'center';
+d.style.justifyContent = 'center';
+
+const digits = document.querySelectorAll('#display .digit');
+digits.forEach(x => {
+    x.style.width = '34px';
+    x.style.margin = '0 4px';
+    x.style.textAlign = 'right';
+});
+
+const seps = document.querySelectorAll('#display .separator');
+seps.forEach(x => {
+    x.style.width = '20px';
+});
 }
 
       document.addEventListener('pointerdown', () => {
