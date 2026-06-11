@@ -178,20 +178,17 @@
 <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script>
     const role = new URLSearchParams(window.location.search).get('role');
-    if (role === 'master') {
+   if (role === 'master') {
     const display = document.getElementById('display');
+    const status = document.getElementById('status');
 
-        document.querySelector('.container').style.transform = 'scale(0.73)';
+    document.querySelector('.container').style.transform = 'scale(0.73)';
 
-        document.getElementById('status').style.position = 'static';
-        document.getElementById('status').style.width = '120px'; // ←これ
-        const status = document.getElementById('status');
+    status.style.position = 'static';
+    status.style.width = '120px';
     status.style.display = 'block';
     status.style.margin = '4px auto 12px';
     status.style.padding = '2px 6px';
-        const status = document.getElementById('status');
-    status.style.display = 'block';
-    status.style.margin = '8px auto 0';
 
     display.style.fontSize = '7rem';
     display.style.padding = '16px 20px';
