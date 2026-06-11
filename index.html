@@ -69,10 +69,10 @@
 }
 .keypad button{
     font-size: 24px; font-weight: 900;
-    height: 75px;
+    height: 80px;
 }
 .resetBtn {
-    height: 75px; background: #556577;
+    height: 80px; background: #556577;
     color: white;
     font-weight: 900;
 }
@@ -184,6 +184,7 @@
         document.querySelector('.container').style.transform = 'scale(0.73)';
 
         document.getElementById('status').style.position = 'static';
+        document.getElementById('status').style.width = '120px'; // ←これ
 
     display.style.fontSize = '7rem';
     display.style.padding = '16px 20px';
