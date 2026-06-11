@@ -181,6 +181,8 @@
     if (role === 'master') {
     const display = document.getElementById('display');
 
+        document.getElementById('displayGroup').style.transform = 'scale(0.8)';
+
     display.style.fontSize = '7rem';
     display.style.padding = '16px 20px';
     display.style.border = '3px solid #FFFFFF';
@@ -378,7 +380,7 @@ conn.on('data', data => {
 if (role === 'slave') {
     const displayGroup = document.getElementById('displayGroup');
 
-    displayGroup.style.transform = 'rotate(90deg)';
+    displayGroup.style.transform = 'rotate(90deg) scale(0.6)';
     displayGroup.style.transformOrigin = 'center center';
 
     displayGroup.style.display = 'flex';
