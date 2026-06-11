@@ -14,35 +14,33 @@
     align-items: center;
     justify-content: center;
 
-    font-size: 80px;
+   font-size: 18vw;
     font-family: 'DS-Digital', monospace;
 
-    border: 3px solid #FFFFFF;
+    border: 2px solid #FFFFFF;
     border-radius: 20px;
 
-    width: 340px;
-    height: 120px;
+    padding: 10px 20px;
 
     background: rgba(255,255,255,0.05);
 
     margin-bottom: 8px;
 }
 .digit {
-    width: 36px;
+    width: 34px;
     text-align: right;
     display: inline-block;
-    margin: 0 6px;
+    margin: 0 4px;
     font-style: italic;
     color: #ff4500;
 }
 .separator {
-    width: 20px;
+    width: auto;
     text-align: center;
     display: inline-block;
     color: #ff0000;
     font-size: 0.8em;
 }
-
     
     .control-row { margin-bottom: 20px; }
     .control-btn { background: #1e293b; padding: 12px 24px; border: none; border-radius: 8px; color: white; cursor: pointer; margin: 0 5px; }
@@ -406,9 +404,6 @@ if(role === 'slave'){
         'translate(-50%, -50%) rotate(90deg) scale(0.6)';
 
     displayGroup.style.transformOrigin = 'center center';
-    const display = document.getElementById('display');
-display.style.fontSize = '80px';
-
 
 }
 
