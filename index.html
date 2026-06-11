@@ -380,6 +380,10 @@ if (role === 'slave') {
 
     displayGroup.style.transform = 'rotate(90deg)';
     displayGroup.style.transformOrigin = 'center center';
+
+    displayGroup.style.display = 'flex';          // ← これ追加
+    displayGroup.style.flexDirection = 'column';  // ← これ追加
+    displayGroup.style.alignItems = 'center';     // ← これ追加
 }
       document.addEventListener('pointerdown', () => {
     if (!wakeLock) keepScreenAwake();
