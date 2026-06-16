@@ -69,10 +69,10 @@
 }
 .keypad button{
     font-size: 24px; font-weight: 900;
-    height: 75px;
+    height: 80px;
 }
 .resetBtn {
-    height: 75px; background: #556577;
+    height: 80px; background: #556577;
     color: white;
     font-weight: 900;
 }
@@ -120,8 +120,9 @@
 <body>
 <div id="tapToConnect" style="position:fixed; inset:0; background:rgba(15, 23, 42, 0.8); display:none; justify-content:center; align-items:center; z-index:9999; cursor:pointer;">
     
-    <div id="tapText" style="color:white; font-size:40px; font-weight:bold;">
-        TAP TO CONNECT
+    <div id="tapText" style="color:white; font-size:30px; font-weight:bold;" text-align:center;>
+        MASTER READY?<br>
+    → TAP HERE
     </div>
 
 </div>
@@ -143,6 +144,7 @@
 <div id="slaveLabel">
     REAL TIME / TIMER
 </div>
+        <div id="status" class="status-unlink">UNLINK</div>
         </div>
 
     
@@ -172,13 +174,22 @@
     </div>
 </div>
 
-<div id="status" class="status-unlink">UNLINK</div>
+
 
 <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script>
     const role = new URLSearchParams(window.location.search).get('role');
-    if (role === 'master') {
+   if (role === 'master') {
     const display = document.getElementById('display');
+    const status = document.getElementById('status');
+
+    document.querySelector('.container').style.transform = 'scale(0.73)';
+
+    status.style.position = 'static';
+    status.style.width = '120px';
+    status.style.display = 'block';
+    status.style.margin = '4px auto 12px';
+    status.style.padding = '2px 6px';
 
     display.style.fontSize = '7rem';
     display.style.padding = '16px 20px';
@@ -374,31 +385,21 @@ conn.on('data', data => {
         setStatus("CONNECTED", "status-connected");
         c.on('data', data => { if(data.type === 'time') { time = data.value; updateDisplay(); } });
     });
- if(role === 'slave'){
-const displayGroup = document.getElementById('displayGroup');
+if (role === 'slave') {
+    const displayGroup = document.getElementById('displayGroup');
 
-displayGroup.style.transform = 'rotate(90deg)';
-displayGroup.style.transformOrigin = 'center center';
-     
+    displayGroup.style.transform = 'rotate(90deg) scale(0.6)';
+    displayGroup.style.transformOrigin = 'center center';
 
-   
+    displayGroup.style.display = 'flex';
+    displayGroup.style.flexDirection = 'column';
+    displayGroup.style.alignItems = 'center';
+
     const status = document.getElementById('status');
-status.style.width = '120px';
-status.style.textAlign = 'center';
-    status.style.transform = 'rotate(90deg)';
-    status.style.transformOrigin = 'center center';
-
-    status.style.position = 'fixed';
-status.style.top = '160px';
-status.style.left = '-20px';
-
-    status.style.right = 'auto';
-    status.style.bottom = 'auto';
-
-   const tapText = document.getElementById('tapText');
-tapText.style.transform = 'rotate(90deg)';
-
+    status.style.position = 'static'; // ← これ追加
+    status.style.marginTop = '10px'; // ← これ
 }
+``
       document.addEventListener('pointerdown', () => {
     if (!wakeLock) keepScreenAwake();
 }, { once: true });
@@ -409,5 +410,9 @@ document.addEventListener('visibilitychange', () => {
     }
 });
 </script>
+<video autoplay muted loop playsinline width="1" height="1">
+    <source src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4" type="video/mp4">
+</video>
+    
 </body>
 </html>
