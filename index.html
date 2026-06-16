@@ -180,21 +180,17 @@
 <script>
     const role = new URLSearchParams(window.location.search).get('role');
    if (role === 'master') {
+    const container = document.querySelector('.container');
     const display = document.getElementById('display');
     const status = document.getElementById('status');
-    const displayGroup = document.getElementById('displayGroup'); // ひとまとまりの塊
 
-    // containerのtransformを消して、displayGroupに対して処理します
-    document.querySelector('.container').style.transform = 'none';
-
-    // 画面いっぱいに表示するための自動調整
-    // displayGroupを画面の95%に収まるようにスケールさせます
+    // 画面全体が収まるスケールを計算して適用する
     const scale = Math.min(
-        (window.innerWidth * 0.95) / displayGroup.offsetWidth,
-        (window.innerHeight * 0.95) / displayGroup.offsetHeight
+        (window.innerWidth * 0.95) / container.offsetWidth,
+        (window.innerHeight * 0.95) / container.offsetHeight
     );
-    displayGroup.style.transform = `scale(${scale})`;
-    displayGroup.style.transformOrigin = 'center center';
+    container.style.transform = `scale(${scale})`;
+    container.style.transformOrigin = 'center center';
 
     status.style.position = 'static';
     status.style.width = '120px';
