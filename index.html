@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
     body { margin: 0; font-family: sans-serif; background: #0f172a; color: #e2e8f0; display: flex; justify-content: center; align-items: center; height: 100vh; flex-direction: column; }
-    .container { text-align: center; transform-origin: center center;}
+    .container { text-align: center; }
     
     #display {
     display: flex;
@@ -127,7 +127,7 @@
 
 </div>
 
-<div class="">
+<div class="container">
     <div id="displayGroup">
    <div id="display">
     <span class="digit">0</span>
@@ -179,19 +179,12 @@
 <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script>
     const role = new URLSearchParams(window.location.search).get('role');
-   if (role === 'master') {const container = document.querySelector('.container');
+   if (role === 'master') {
     const display = document.getElementById('display');
     const status = document.getElementById('status');
 
-    // 画面いっぱいに収まる倍率を計算する
-    // 親機の画面（端末）の幅と高さから、containerがどれくらい大きくなれるか算出
-    const scale = Math.min(
-        (window.innerWidth * 0.95) / container.offsetWidth,
-        (window.innerHeight * 0.95) / container.offsetHeight
-    );
+    document.querySelector('.container').style.transform = 'scale(0.73)';
 
-    // 全体を一塊としてスケール適用
-    container.style.transform = `scale(${scale})`;
     status.style.position = 'static';
     status.style.width = '120px';
     status.style.display = 'block';
