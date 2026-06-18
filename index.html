@@ -191,10 +191,10 @@ function autoScale() {
 
     const rect = container.getBoundingClientRect();
 
-    const scaleX = (window.innerWidth * 0.95) / rect.width;
-    const scaleY = (window.innerHeight * 0.95) / rect.height;
+    const scaleX = (window.innerWidth * 0.92) / rect.width;
+    const scaleY = (window.innerHeight * 0.92) / rect.height;
 
-    const scale = Math.min(scaleX, scaleY, 1);
+    const scale = Math.min(scaleX, scaleY);
 
     container.style.transform = `scale(${scale})`;
 }
