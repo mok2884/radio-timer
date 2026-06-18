@@ -406,16 +406,40 @@ conn.on('data', data => {
 if (role === 'slave') {
     const displayGroup = document.getElementById('displayGroup');
 
-    displayGroup.style.transform = 'rotate(90deg) scale(0.6)';
-    displayGroup.style.transformOrigin = 'center center';
+    function autoScaleSlave() {
 
+        displayGroup.style.transform =
+            'rotate(90deg) scale(1)';
+
+        const rect =
+            displayGroup.getBoundingClientRect();
+
+        const scaleX =
+            (window.innerHeight * 0.92) / rect.width;
+
+        const scaleY =
+            (window.innerWidth * 0.92) / rect.height;
+
+        const scale =
+            Math.min(scaleX, scaleY);
+
+        displayGroup.style.transform =
+            `rotate(90deg) scale(${scale})`;
+    }
+
+    window.addEventListener('load', autoScaleSlave);
+    window.addEventListener('resize', autoScaleSlave);
+
+    setTimeout(autoScaleSlave, 100);
+
+    displayGroup.style.transformOrigin = 'center center';
     displayGroup.style.display = 'flex';
     displayGroup.style.flexDirection = 'column';
     displayGroup.style.alignItems = 'center';
 
     const status = document.getElementById('status');
-    status.style.position = 'static'; // ← これ追加
-    status.style.marginTop = '10px'; // ← これ
+    status.style.position = 'static';
+    status.style.marginTop = '10px';
 }
       document.addEventListener('pointerdown', () => {
     if (!wakeLock) keepScreenAwake();
