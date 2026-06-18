@@ -183,8 +183,26 @@
     const display = document.getElementById('display');
     const status = document.getElementById('status');
 
-    document.querySelector('.container').style.transform = 'scale(0.73)';
+   const container = document.querySelector('.container');
 
+function autoScale() {
+
+    container.style.transform = 'scale(1)';
+
+    const rect = container.getBoundingClientRect();
+
+    const scaleX = (window.innerWidth * 0.95) / rect.width;
+    const scaleY = (window.innerHeight * 0.95) / rect.height;
+
+    const scale = Math.min(scaleX, scaleY, 1);
+
+    container.style.transform = `scale(${scale})`;
+}
+
+window.addEventListener('load', autoScale);
+window.addEventListener('resize', autoScale);
+
+setTimeout(autoScale, 100);
     status.style.position = 'static';
     status.style.width = '120px';
     status.style.display = 'block';
