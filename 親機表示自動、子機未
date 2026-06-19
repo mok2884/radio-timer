@@ -5,7 +5,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700;900&display=swap" rel="stylesheet">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-    body { margin: 0; font-family: sans-serif; background: #0f172a; color: #e2e8f0; display: flex; justify-content: center; align-items: center; height: 100vh; flex-direction: column; }
+    body { margin: 0; font-family: sans-serif; background: #0f172a; color: #e2e8f0; display: flex; justify-content: center; align-items: center; height: 100vh; flex-direction: column; overflow: hidden; overscroll-behavior: none;}
     .container { text-align: center; }
     
     #display {
@@ -183,8 +183,26 @@
     const display = document.getElementById('display');
     const status = document.getElementById('status');
 
-    document.querySelector('.container').style.transform = 'scale(0.73)';
+   const container = document.querySelector('.container');
 
+function autoScale() {
+
+    container.style.transform = 'scale(1)';
+
+    const rect = container.getBoundingClientRect();
+
+    const scaleX = (window.innerWidth * 0.92) / rect.width;
+    const scaleY = (window.innerHeight * 0.92) / rect.height;
+
+    const scale = Math.min(scaleX, scaleY);
+
+    container.style.transform = `scale(${scale})`;
+}
+
+window.addEventListener('load', autoScale);
+window.addEventListener('resize', autoScale);
+
+setTimeout(autoScale, 100);
     status.style.position = 'static';
     status.style.width = '120px';
     status.style.display = 'block';
@@ -217,10 +235,12 @@ let editing = false;
 
     // 操作エリアを表示する関数
     function showControls() {
-        if (role === 'master') {
-            document.getElementById('uiArea').style.display = 'block';
-        }
+    if (role === 'master') {
+        document.getElementById('uiArea').style.display = 'block';
+
+        setTimeout(autoScale, 50);
     }
+}
 
    function press(n) {
 
@@ -388,18 +408,41 @@ conn.on('data', data => {
 if (role === 'slave') {
     const displayGroup = document.getElementById('displayGroup');
 
-    displayGroup.style.transform = 'rotate(90deg) scale(0.6)';
-    displayGroup.style.transformOrigin = 'center center';
+    function autoScaleSlave() {
 
+        displayGroup.style.transform =
+            'rotate(90deg) scale(1)';
+
+        const rect =
+            displayGroup.getBoundingClientRect();
+
+        const scaleX =
+            (window.innerHeight * 0.88) / rect.width;
+
+        const scaleY =
+            (window.innerWidth * 0.88) / rect.height;
+
+        const scale =
+            Math.min(scaleX, scaleY);
+
+        displayGroup.style.transform =
+            `rotate(90deg) scale(${scale})`;
+    }
+
+    window.addEventListener('load', autoScaleSlave);
+    window.addEventListener('resize', autoScaleSlave);
+
+    setTimeout(autoScaleSlave, 100);
+
+    displayGroup.style.transformOrigin = 'center center';
     displayGroup.style.display = 'flex';
     displayGroup.style.flexDirection = 'column';
     displayGroup.style.alignItems = 'center';
 
     const status = document.getElementById('status');
-    status.style.position = 'static'; // ← これ追加
-    status.style.marginTop = '10px'; // ← これ
+    status.style.position = 'static';
+    status.style.marginTop = '10px';
 }
-``
       document.addEventListener('pointerdown', () => {
     if (!wakeLock) keepScreenAwake();
 }, { once: true });
