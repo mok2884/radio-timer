@@ -427,11 +427,10 @@ if (role === 'slave') {
 
     scale = Math.min(scale, 1.0);
 
-    display.style.transform =
-    `scale(${scale})`;
+    displayGroup.style.transform =
+    `rotate(90deg) scale(${scale})`;
 
-displayGroup.style.transform =
-    'rotate(90deg)';
+display.style.transform = '';
 }
 
     window.addEventListener('load', autoScaleSlave);
@@ -440,7 +439,7 @@ displayGroup.style.transform =
     setTimeout(autoScaleSlave, 100);
 
     displayGroup.style.transformOrigin = 'center center';
-    display.style.transformOrigin = 'center center';
+    //display.style.transformOrigin = 'center center';//
     displayGroup.style.display = 'flex';
     displayGroup.style.flexDirection = 'column';
     displayGroup.style.alignItems = 'center';
