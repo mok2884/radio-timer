@@ -410,24 +410,25 @@ if (role === 'slave') {
 
     function autoScaleSlave() {
 
-        displayGroup.style.transform =
-            'rotate(90deg) scale(1)';
+    const baseWidth = 800;
+    const baseHeight = 450;
 
-        const rect =
-            displayGroup.getBoundingClientRect();
+    const windowWidth = window.innerWidth;
+    const windowHeight = window.innerHeight;
 
-        const scaleX =
-            (window.innerHeight * 0.88) / rect.width;
+    const targetWidth = windowHeight * 0.80;
+    const targetHeight = windowWidth * 0.95;
 
-        const scaleY =
-            (window.innerWidth * 0.88) / rect.height;
+    const scaleX = targetWidth / baseWidth;
+    const scaleY = targetHeight / baseHeight;
 
-        const scale =
-            Math.min(scaleX, scaleY);
+    let scale = Math.min(scaleX, scaleY);
 
-        displayGroup.style.transform =
-            `rotate(90deg) scale(${scale})`;
-    }
+    scale = Math.min(scale, 1.0);
+
+    displayGroup.style.transform =
+        `rotate(90deg) scale(${scale})`;
+}
 
     window.addEventListener('load', autoScaleSlave);
     window.addEventListener('resize', autoScaleSlave);
