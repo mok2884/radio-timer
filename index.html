@@ -407,31 +407,27 @@ conn.on('data', data => {
     });
 if (role === 'slave') {
     const displayGroup = document.getElementById('displayGroup');
-    const display = document.getElementById('display');
 
     function autoScaleSlave() {
 
-    const baseWidth = 800;
-    const baseHeight = 450;
+        displayGroup.style.transform =
+            'rotate(90deg) scale(1)';
 
-    const windowWidth = window.innerWidth;
-    const windowHeight = window.innerHeight;
+        const rect =
+            displayGroup.getBoundingClientRect();
 
-    const targetWidth = windowHeight * 0.80;
-    const targetHeight = windowWidth * 0.95;
+        const scaleX =
+            (window.innerHeight * 0.88) / rect.width;
 
-    const scaleX = targetWidth / baseWidth;
-    const scaleY = targetHeight / baseHeight;
+        const scaleY =
+            (window.innerWidth * 0.88) / rect.height;
 
-    let scale = Math.min(scaleX, scaleY);
+        const scale =
+            Math.min(scaleX, scaleY);
 
-    scale = Math.min(scale, 1.0);
-
-    displayGroup.style.transform =
-    `rotate(90deg) scale(${scale})`;
-
-display.style.transform = '';
-}
+        displayGroup.style.transform =
+            `rotate(90deg) scale(${scale})`;
+    }
 
     window.addEventListener('load', autoScaleSlave);
     window.addEventListener('resize', autoScaleSlave);
@@ -439,7 +435,6 @@ display.style.transform = '';
     setTimeout(autoScaleSlave, 100);
 
     displayGroup.style.transformOrigin = 'center center';
-    //display.style.transformOrigin = 'center center';//
     displayGroup.style.display = 'flex';
     displayGroup.style.flexDirection = 'column';
     displayGroup.style.alignItems = 'center';
