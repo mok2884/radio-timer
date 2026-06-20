@@ -208,6 +208,10 @@ alert(
     container.style.transform = `scale(${scale})`;
     const r = container.getBoundingClientRect();
 
+status.innerText =
+  `L:${Math.round(r.left)} T:${Math.round(r.top)}`;
+    const r = container.getBoundingClientRect();
+
 alert(
   `L:${Math.round(r.left)}\n` +
   `T:${Math.round(r.top)}\n` +
