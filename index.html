@@ -5,11 +5,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700;900&display=swap" rel="stylesheet">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-    body { margin: 0; font-family: sans-serif; background: #0f172a; color: #e2e8f0; display: flex; justify-content: center; align-items: center; height: 100dvh; flex-direction: column; overflow: hidden; overscroll-behavior: none;}
-    .container {
-    text-align: center;
-    transform-origin: center center;
-}
+    body { margin: 0; font-family: sans-serif; background: #0f172a; color: #e2e8f0; display: flex; justify-content: center; align-items: center; height: 100vh; flex-direction: column; overflow: hidden; overscroll-behavior: none;}
+    .container { text-align: center; }
     
     #display {
     display: flex;
@@ -428,14 +425,28 @@ if (role === 'slave') {
         const scale =
             Math.min(scaleX, scaleY);
 
+        console.log(
+    "AUTO",
+    window.innerWidth,
+    window.innerHeight,
+    rect.width,
+    rect.height,
+    scale
+);
+
         displayGroup.style.transform =
             `rotate(90deg) scale(${scale})`;
     }
 
-    window.addEventListener('load', autoScaleSlave);
-    window.addEventListener('resize', autoScaleSlave);
+  window.addEventListener('load', () => {
+    setTimeout(autoScale, 500);
+});
 
-    setTimeout(autoScaleSlave, 100);
+window.addEventListener('resize', autoScale);
+
+window.addEventListener('orientationchange', () => {
+    setTimeout(autoScale, 500);
+});
 
     displayGroup.style.transformOrigin = 'center center';
     displayGroup.style.display = 'flex';
