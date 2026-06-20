@@ -187,8 +187,8 @@
 
 function autoScale() {
 
-    container.style.transform = 'scale(1)';
-
+    
+container.style.visibility = 'hidden';
     const rect = container.getBoundingClientRect();
 
     const scaleX = (window.innerWidth * 0.92) / rect.width;
@@ -197,6 +197,7 @@ function autoScale() {
     const scale = Math.min(scaleX, scaleY);
 
     container.style.transform = `scale(${scale})`;
+    container.style.visibility = 'visible';
 }
 
 window.addEventListener('load', autoScale);
