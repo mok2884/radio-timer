@@ -195,7 +195,13 @@ function autoScale() {
     const scaleY = (window.innerHeight * 0.92) / rect.height;
 
     const scale = Math.min(scaleX, scaleY);
-
+alert(
+  'w=' + window.innerWidth +
+  '\nh=' + window.innerHeight +
+  '\nrectW=' + rect.width +
+  '\nrectH=' + rect.height +
+  '\nscale=' + scale
+);
     container.style.transform = `scale(${scale})`;
 }
 
