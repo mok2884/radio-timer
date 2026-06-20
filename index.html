@@ -6,10 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
     body { margin: 0; font-family: sans-serif; background: #0f172a; color: #e2e8f0; display: flex; justify-content: center; align-items: center; height: 100vh; flex-direction: column; overflow: hidden; overscroll-behavior: none;}
-   .container {
-    text-align: center;
-    outline: 5px solid yellow;
-}
+    .container { text-align: center; }
     
     #display {
     display: flex;
@@ -198,26 +195,8 @@ function autoScale() {
     const scaleY = (window.innerHeight * 0.92) / rect.height;
 
     const scale = Math.min(scaleX, scaleY);
-alert(
-  'w=' + window.innerWidth +
-  '\nh=' + window.innerHeight +
-  '\nrectW=' + rect.width +
-  '\nrectH=' + rect.height +
-  '\nscale=' + scale
-);
+
     container.style.transform = `scale(${scale})`;
-    const r = container.getBoundingClientRect();
-
-status.innerText =
-  `L:${Math.round(r.left)} T:${Math.round(r.top)}`;
-    const r = container.getBoundingClientRect();
-
-alert(
-  `L:${Math.round(r.left)}\n` +
-  `T:${Math.round(r.top)}\n` +
-  `R:${Math.round(r.right)}\n` +
-  `B:${Math.round(r.bottom)}`
-);
 }
 
 window.addEventListener('load', autoScale);
@@ -259,7 +238,7 @@ let editing = false;
     if (role === 'master') {
         document.getElementById('uiArea').style.display = 'block';
 
-        setTimeout(autoScale, 1000);
+        setTimeout(autoScale, 50);
     }
 }
 
