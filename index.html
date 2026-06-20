@@ -425,28 +425,14 @@ if (role === 'slave') {
         const scale =
             Math.min(scaleX, scaleY);
 
-        console.log(
-    "AUTO",
-    window.innerWidth,
-    window.innerHeight,
-    rect.width,
-    rect.height,
-    scale
-);
-
         displayGroup.style.transform =
             `rotate(90deg) scale(${scale})`;
     }
 
-  window.addEventListener('load', () => {
-    setTimeout(autoScale, 500);
-});
+    window.addEventListener('load', autoScaleSlave);
+    window.addEventListener('resize', autoScaleSlave);
 
-window.addEventListener('resize', autoScale);
-
-window.addEventListener('orientationchange', () => {
-    setTimeout(autoScale, 500);
-});
+    setTimeout(autoScaleSlave, 100);
 
     displayGroup.style.transformOrigin = 'center center';
     displayGroup.style.display = 'flex';
