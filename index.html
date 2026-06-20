@@ -208,8 +208,12 @@ alert(
     container.style.transform = `scale(${scale})`;
     const r = container.getBoundingClientRect();
 
-document.getElementById('slaveLabel').innerText =
-  `L:${Math.round(r.left)} T:${Math.round(r.top)} R:${Math.round(r.right)} B:${Math.round(r.bottom)}`;
+alert(
+  `L:${Math.round(r.left)}\n` +
+  `T:${Math.round(r.top)}\n` +
+  `R:${Math.round(r.right)}\n` +
+  `B:${Math.round(r.bottom)}`
+);
 }
 
 window.addEventListener('load', autoScale);
