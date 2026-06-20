@@ -206,6 +206,10 @@ alert(
   '\nscale=' + scale
 );
     container.style.transform = `scale(${scale})`;
+    const r = container.getBoundingClientRect();
+
+document.getElementById('slaveLabel').innerText =
+  `L:${Math.round(r.left)} T:${Math.round(r.top)} R:${Math.round(r.right)} B:${Math.round(r.bottom)}`;
 }
 
 window.addEventListener('load', autoScale);
