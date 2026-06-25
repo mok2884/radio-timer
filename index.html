@@ -432,12 +432,19 @@ conn.on('data', data => {
             updateDisplay();
         }
 
-        if(data.type === 'slaveTime') {
-            slaveTime = data.value;
+       if(data.type === 'slaveTime') {
 
-            document.getElementById('slaveMonitor').innerText =
-                "S:" + slaveTime;
-        }
+    slaveTime = data.value;
+
+    const h = Math.floor(slaveTime / 3600);
+    const m = Math.floor((slaveTime % 3600) / 60);
+    const s = slaveTime % 60;
+
+    document.getElementById('slaveMonitor').innerText =
+        String(h).padStart(2,'0') + ":" +
+        String(m).padStart(2,'0') + ":" +
+        String(s).padStart(2,'0');
+}
     });
 });
 if (role === 'slave') {
