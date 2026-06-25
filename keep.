@@ -130,7 +130,7 @@
 <div class="container">
 <div id="displayGroup">
     <div style="width: 100%; display: flex; justify-content: flex-end;">
-        <button onclick="location.reload()" style="background: #334155; border: 1px solid #475569; color: #cbd5e1; border-radius: 4px; padding: 8px 14px; font-size: 16px; cursor: pointer; margin-bottom: 12px;">RELOAD</button>
+        <button onclick="location.reload()" style="background: #334155; border: 1px solid #475569; color: #cbd5e1; border-radius: 4px; padding: 4px 8px; font-size: 12px; cursor: pointer; margin-bottom: 5px;">RELOAD</button>
     </div>
     <div id="display">
     <span class="digit">0</span>
