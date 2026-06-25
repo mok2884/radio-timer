@@ -246,6 +246,7 @@ setTimeout(autoScale, 100);
 let savedBuffer = "";
 let editing = false;
     let wakeLock = null;
+    let slaveTime = null;
 
     // 操作エリアを表示する関数
     function showControls() {
@@ -398,6 +399,12 @@ conn.on('data', data => {
 
         time = data.value;
         updateDisplay();
+        if (conn) {
+    conn.send({
+        type: 'slaveTime',
+        value: time
+    });
+}
     }
 });
         conn.on('close', () => { setStatus("UNLINK", "status-unlink"); setTimeout(connectToMaster, 3000); });
@@ -414,11 +421,25 @@ conn.on('data', data => {
     }
 });
     peer.on('connection', c => {
-        conn = c; 
-        showControls(); // 親機だけ操作エリアが出る
-        setStatus("CONNECTED", "status-connected");
-        c.on('data', data => { if(data.type === 'time') { time = data.value; updateDisplay(); } });
+    conn = c;
+    showControls();
+    setStatus("CONNECTED", "status-connected");
+
+    c.on('data', data => {
+
+        if(data.type === 'time') {
+            time = data.value;
+            updateDisplay();
+        }
+
+        if(data.type === 'slaveTime') {
+            slaveTime = data.value;
+
+            document.getElementById('slaveMonitor').innerText =
+                "S:" + slaveTime;
+        }
     });
+});
 if (role === 'slave') {
     const displayGroup = document.getElementById('displayGroup');
 
