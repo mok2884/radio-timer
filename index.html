@@ -288,7 +288,7 @@ function updateDisplay() {
             updateDisplay();
             if (conn) conn.send({type: 'time', value: time, seq: seq++});
 
-        }, 200);
+        },100);
 
         // ボタンを暗くする
         resetBtn.classList.add('disabled');
