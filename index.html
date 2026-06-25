@@ -168,17 +168,6 @@
             <button onclick="setTimer()" class="setBtn" style="font-size: 16px;">TIME SET</button>
         </div>
 <div class="rightPanel">
-    <div id="slaveMonitor"
-     style="
-        text-align:right;
-        font-size:11px;
-        color:white;
-        height:14px;
-        margin-bottom:4px;
-        opacity:0.8;
-     ">
---
-</div>
     <button class="resetBtn" onclick="resetTimer()">set ZERO</button>
     <button class="startBtn" onclick="toggleTimer()">START / STOP</button>
 </div>
@@ -246,7 +235,6 @@ setTimeout(autoScale, 100);
 let savedBuffer = "";
 let editing = false;
     let wakeLock = null;
-    let slaveTime = null;
 
     // 操作エリアを表示する関数
     function showControls() {
@@ -399,12 +387,6 @@ conn.on('data', data => {
 
         time = data.value;
         updateDisplay();
-        if (conn) {
-    conn.send({
-        type: 'ack',
-        time: time
-    });
-}
     }
 });
         conn.on('close', () => { setStatus("UNLINK", "status-unlink"); setTimeout(connectToMaster, 3000); });
@@ -424,20 +406,7 @@ conn.on('data', data => {
         conn = c; 
         showControls(); // 親機だけ操作エリアが出る
         setStatus("CONNECTED", "status-connected");
-      c.on('data', data => {
-
-    if(data.type === 'time') {
-        time = data.value;
-        updateDisplay();
-    }
-
-    if(data.type === 'ack') {
-        slaveTime = data.time;
-
-        document.getElementById('slaveMonitor').innerText =
-            "S:" + slaveTime;
-    }
-});
+        c.on('data', data => { if(data.type === 'time') { time = data.value; updateDisplay(); } });
     });
 if (role === 'slave') {
     const displayGroup = document.getElementById('displayGroup');
