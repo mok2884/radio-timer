@@ -461,6 +461,18 @@ conn.on('data', data => {
     String(h).padStart(2,'0') + ":" +
     String(m).padStart(2,'0') + ":" +
     String(s).padStart(2,'0');
+           const diff = Math.abs(time - slaveTime);
+
+const alertEl = document.getElementById('slaveAlert');
+const timeEl  = document.getElementById('slaveTimeText');
+
+if (diff >= 5) {
+    alertEl.style.color = "#ff3030";
+    timeEl.style.color = "#ff3030";
+} else {
+    alertEl.style.color = "#555";
+    timeEl.style.color = "#666";
+}
 }
     });
 });
