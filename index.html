@@ -174,18 +174,31 @@
 </div>
 <div id="slaveMonitor"
      style="
-        color:white;
-        font-size:16px;
-        font-weight:700;
         text-align:right;
         margin-top:8px;
-        padding-right:4px;
-        opacity:0.7;
-        font-family:monospace;
         width:100%;
         box-sizing:border-box;
-     ">
-    --
+        padding-right:4px;
+        font-family:monospace;
+        font-size:16px;
+    ">
+
+    <span id="slaveAlert"
+          style="
+             color:#555;
+             font-weight:900;
+             margin-right:12px;
+        ">
+        CHECK SLAVE!
+    </span>
+
+    <span id="slaveTimeText"
+          style="
+             color:#666;
+        ">
+        00:00:00
+    </span>
+
 </div>
 
             
@@ -444,10 +457,10 @@ conn.on('data', data => {
     const m = Math.floor((slaveTime % 3600) / 60);
     const s = slaveTime % 60;
 
-    document.getElementById('slaveMonitor').innerText =
-        String(h).padStart(2,'0') + ":" +
-        String(m).padStart(2,'0') + ":" +
-        String(s).padStart(2,'0');
+    document.getElementById('slaveTimeText').innerText =
+    String(h).padStart(2,'0') + ":" +
+    String(m).padStart(2,'0') + ":" +
+    String(s).padStart(2,'0');
 }
     });
 });
