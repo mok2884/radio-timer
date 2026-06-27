@@ -267,7 +267,6 @@ let savedBuffer = "";
 let editing = false;
     let wakeLock = null;
     let slaveTime = null;
-    let diffStartTime = null;
 
     // 操作エリアを表示する関数
     function showControls() {
@@ -398,20 +397,9 @@ function updateDisplay() {
     const timeEl  = document.getElementById('slaveTimeText');
 
     if (diff >= 3) {
-
-        if (diffStartTime === null) {
-            diffStartTime = Date.now();
-        }
-
-        if (Date.now() - diffStartTime >= 1000) {
-            alertEl.style.color = "#ff3030";
-            timeEl.style.color = "#ff3030";
-        }
-
+        alertEl.style.color = "#ff3030";
+        timeEl.style.color = "#ff3030";
     } else {
-
-        diffStartTime = null;
-
         alertEl.style.color = "#555";
         timeEl.style.color = "#666";
     }
