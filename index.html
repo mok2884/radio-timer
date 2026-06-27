@@ -267,6 +267,7 @@ let savedBuffer = "";
 let editing = false;
     let wakeLock = null;
     let slaveTime = null;
+    let ignoreDiffUntil = 0;
 
     // 操作エリアを表示する関数
     function showControls() {
@@ -321,6 +322,7 @@ let editing = false;
         const m = Math.floor((total % 10000) / 100);
         const s = total % 100;
         time = h * 3600 + m * 60 + s;
+        ignoreDiffUntil = Date.now() + 1000;
         updateDisplay();
         savedBuffer = inputBuffer;
 editing = false;
@@ -388,7 +390,7 @@ function updateDisplay() {
 }
 
     function checkSlaveDiff() {
-
+if (Date.now() < ignoreDiffUntil) return;
     if (slaveTime === null) return;
 
     const diff = Math.abs(time - slaveTime);
@@ -409,6 +411,7 @@ if (timer) return;
     clearInterval(timer);
     timer = null;
     time = 0;
+        ignoreDiffUntil = Date.now() + 1000;
     startTime = Date.now();
     updateDisplay();
 
