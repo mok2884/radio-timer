@@ -352,6 +352,7 @@ function updateDisplay() {
     for(let i=0;i<6;i++){
         digits[i].innerText = txt[i];
     }
+    checkSlaveDiff();
 }
 
     function toggleTimer() {
@@ -383,6 +384,23 @@ function updateDisplay() {
     }
 }
 
+    function checkSlaveDiff() {
+
+    if (slaveTime === null) return;
+
+    const diff = Math.abs(time - slaveTime);
+
+    const alertEl = document.getElementById('slaveAlert');
+    const timeEl  = document.getElementById('slaveTimeText');
+
+    if (diff >= 3) {
+        alertEl.style.color = "#ff3030";
+        timeEl.style.color = "#ff3030";
+    } else {
+        alertEl.style.color = "#555";
+        timeEl.style.color = "#666";
+    }
+}
     function resetTimer() { 
 if (timer) return;
     clearInterval(timer);
