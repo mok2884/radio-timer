@@ -194,12 +194,13 @@
         CHECK SLAVE!
     </span>
 
-    <span id="slaveTimeText"
-          style="
-             color:#666;
-        ">
-        00:00:00
-    </span>
+    
+<span id="slaveTimeText"
+      style="color:#666;">
+    00:00:00
+</span>
+<span id="connDot" style="margin-left:10px;">●</span>
+
 
 </div>
 
@@ -267,6 +268,28 @@ let savedBuffer = "";
 let editing = false;
     let wakeLock = null;
     let slaveTime = null;
+function updateConnDot() {
+
+    if (!conn || !conn.peerConnection) return;
+
+    conn.peerConnection.getStats().then(stats => {
+        stats.forEach(r => {
+
+            if (r.type === 'candidate-pair' && r.state === 'succeeded') {
+
+                const dot = document.getElementById('connDot');
+
+                if (r.localCandidateType === 'relay') {
+                    dot.style.color = "#facc15"; // 黄色
+                } else {
+                    dot.style.color = "#ffffff"; // 白
+                }
+
+            }
+        });
+    });
+}
+    
     let ignoreDiffUntil = 0;
 
     // 操作エリアを表示する関数
@@ -427,7 +450,7 @@ if (timer) return;
     function connectToMaster() {
         setStatus("CONNECTING...", "status-connecting");
         conn = peer.connect(MASTER_ID);
-        conn.on('open', () => { setStatus("CONNECTED", "status-connected"); /* 子機は controls を表示しない */ });
+        conn.on('open', () => { setStatus("CONNECTED", "status-connected"); /* 子機は controls を表示しない */setTimeout(updateConnDot, 1000); });
        let lastUpdateTime = 0;
         let lastReceived = 0;
 
@@ -465,6 +488,7 @@ conn.on('data', data => {
     conn = c;
     showControls();
     setStatus("CONNECTED", "status-connected");
+        setTimeout(updateConnDot, 1000);
 
     c.on('data', data => {
 
