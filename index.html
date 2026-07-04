@@ -546,7 +546,10 @@ if (role === 'slave') {
     displayGroup.style.display = 'flex';
     displayGroup.style.flexDirection = 'column';
     displayGroup.style.alignItems = 'center';
-
+document.querySelectorAll('.separator').forEach(s => {
+    s.style.fontSize = '1.0em';   // お好みで 1.05em や 1.1em
+    s.style.fontWeight = '900';
+});
     const status = document.getElementById('status');
     status.style.position = 'static';
     status.style.marginTop = '10px';
