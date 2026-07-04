@@ -162,16 +162,16 @@
 
         <div class="mainRow">
         <div class="keypad">
-    <button onpointerup="press(1)">1</button><button onpointerup="press(2)">2</button><button onpointerup="press(3)">3</button>
-    <button onpointerup="press(4)">4</button><button onpointerup="press(5)">5</button><button onpointerup="press(6)">6</button>
-    <button onpointerup="press(7)">7</button><button onpointerup="press(8)">8</button><button onpointerup="press(9)">9</button>
-    <button onpointerup="clearInput()" class="action-btn">CLR</button>
-    <button onpointerup="press(0)">0</button>
-    <button onpointerup="setTimer()" class="setBtn" style="font-size: 16px;">TIME SET</button>
-</div>
+            <button onclick="press(1)">1</button><button onclick="press(2)">2</button><button onclick="press(3)">3</button>
+            <button onclick="press(4)">4</button><button onclick="press(5)">5</button><button onclick="press(6)">6</button>
+            <button onclick="press(7)">7</button><button onclick="press(8)">8</button><button onclick="press(9)">9</button>
+            <button onclick="clearInput()" class="action-btn">CLR</button>
+            <button onclick="press(0)">0</button>
+            <button onclick="setTimer()" class="setBtn" style="font-size: 16px;">TIME SET</button>
+        </div>
 <div class="rightPanel">
-    <button class="resetBtn" onpointerup="resetTimer()">set ZERO</button>
-    <button class="startBtn" onpointerup="toggleTimer()">START / STOP</button>
+    <button class="resetBtn" onclick="resetTimer()">set ZERO</button>
+    <button class="startBtn" onclick="toggleTimer()">START / STOP</button>
 </div>
 </div>
 <div id="slaveMonitor"
@@ -550,11 +550,6 @@ if (role === 'slave') {
     const status = document.getElementById('status');
     status.style.position = 'static';
     status.style.marginTop = '10px';
-const style = document.createElement('style');
-    style.innerHTML = `.separator { font-weight: 900 !important; transform: scaleX(1.5) translateX(6px) !important; }`;
-    document.head.appendChild(style);
-
-    
 }
       document.addEventListener('pointerdown', () => {
     if (!wakeLock) keepScreenAwake();
