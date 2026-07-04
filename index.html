@@ -301,35 +301,6 @@ function updateConnDot() {
     }
 }
 
-let pressedAction = null;
-
-function bindSlideButton(selector) {
-
-    document.querySelectorAll(selector).forEach(btn => {
-
-        btn.addEventListener('mousedown', remember);
-        btn.addEventListener('touchstart', remember, { passive: true });
-
-        function remember() {
-            pressedAction = () => btn.click();
-        }
-
-    });
-
-    window.addEventListener('mouseup', runPressed);
-    window.addEventListener('touchend', runPressed);
-
-}
-
-function runPressed() {
-
-    if (!pressedAction) return;
-
-    const action = pressedAction;
-    pressedAction = null;
-    action();
-}
-    
    function press(n) {
 
     if (!editing) {
@@ -583,9 +554,7 @@ if (role === 'slave') {
       document.addEventListener('pointerdown', () => {
     if (!wakeLock) keepScreenAwake();
 }, { once: true });
-bindSlideButton('.keypad button');
-bindSlideButton('.resetBtn');
-bindSlideButton('.startBtn');
+
 document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') {
         keepScreenAwake();
