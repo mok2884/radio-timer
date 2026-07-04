@@ -550,6 +550,11 @@ if (role === 'slave') {
     const status = document.getElementById('status');
     status.style.position = 'static';
     status.style.marginTop = '10px';
+const style = document.createElement('style');
+    style.innerHTML = `.separator { font-size: 1.5em !important; font-weight: 900 !important; }`;
+    document.head.appendChild(style);
+
+    
 }
       document.addEventListener('pointerdown', () => {
     if (!wakeLock) keepScreenAwake();
