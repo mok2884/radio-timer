@@ -261,7 +261,8 @@ setTimeout(autoScale, 100);
     const MASTER_ID = 'radio-secret-id-Zyxw-Vuts-9821-Kjhl'; 
     const peer = new Peer(role === 'master' ? MASTER_ID : null);
     
-    let conn, time = 0, timer = null, inputBuffer = "";
+    let conns = [];
+let conn, time = 0, timer = null, inputBuffer = "";
     let seq = 0;
     let startTime = 0;
 let savedBuffer = "";
@@ -351,7 +352,7 @@ function updateConnDot() {
         savedBuffer = inputBuffer;
 editing = false;
 updatePreview();
-        if (conn) conn.send({type: 'time', value: time});
+       sendToAll({type: 'time', value: time});
     }
 
   async function keepScreenAwake() {
@@ -429,7 +430,7 @@ checkSlaveDiff();
         timer = setInterval(() => {
             time = Math.floor((Date.now() - startTime) / 1000);
             updateDisplay();
-            if (conn) conn.send({type: 'time', value: time, seq: seq++});
+           sendToAll({type: 'time', value: time, seq: seq++});
 
         }, 100);
 
@@ -466,12 +467,17 @@ if (timer) return;
     updateDisplay();
 
     setTimeout(() => {
-        if (conn) conn.send({type: 'time', value: time});
+        sendToAll({type: 'time', value: time});
     }, 50);
 }
 
 
     const statusEl = document.getElementById('status');
+    function sendToAll(data) {
+    conns.forEach(c => {
+        if (c.open) c.send(data);
+    });
+}
     function setStatus(text, className) { statusEl.innerText = text; statusEl.className = className; }
 
     function connectToMaster() {
@@ -513,6 +519,10 @@ conn.on('data', data => {
 });
     peer.on('connection', c => {
     conn = c;
+    conns.push(c);
+c.on('close', () => {
+    conns = conns.filter(x => x !== c);
+});
     showControls();
     setStatus("CONNECTED", "status-connected");
         setTimeout(updateConnDot, 1000);
