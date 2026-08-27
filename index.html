@@ -546,8 +546,12 @@ if (role === 'slave') {
     displayGroup.style.display = 'flex';
     displayGroup.style.flexDirection = 'column';
     displayGroup.style.alignItems = 'center';
+    document.querySelectorAll('.digit').forEach(d => {
+d.style.margin = '0 16px';
+});
 document.querySelectorAll('.separator').forEach(s => {
-    s.style.fontSize = '0.9em';   // お好みで 1.05em や 1.1em
+    s.style.fontSize = '1.15em';   // お好みで 1.05em や 1.1em
+    s.style.width = '60px';
     s.style.fontWeight = '900';
 });
     const status = document.getElementById('status');
