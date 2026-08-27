@@ -268,6 +268,7 @@ let savedBuffer = "";
 let editing = false;
     let wakeLock = null;
     let slaveTime = null;
+    let lastBlinkSecond = -1;
 function updateConnDot() {
 
     if (!conn || !conn.peerConnection) return;
@@ -540,7 +541,7 @@ conn.on('data', data => {
     });
 });
 if (role === 'slave') {
-    let lastBlinkSecond = -1;
+    
     const displayGroup = document.getElementById('displayGroup');
 
     function autoScaleSlave() {
