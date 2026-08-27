@@ -554,6 +554,31 @@ document.querySelectorAll('.separator').forEach(s => {
     s.style.width = '52px';
     s.style.fontWeight = '900';
 });
+    setInterval(() => {
+
+    const bright =
+        Math.floor(Date.now() / 500) % 2 === 0;
+
+    document.querySelectorAll('.separator').forEach(s => {
+
+        s.style.textShadow = 'none';
+
+        if (bright) {
+
+            s.style.opacity = '1';
+            s.style.color = '#ff2222';
+            s.style.textShadow =
+                '0 0 8px rgba(255,0,0,0.9), 0 0 16px rgba(255,0,0,0.55)';
+
+        } else {
+
+            s.style.opacity = '0.2';
+
+        }
+
+    });
+
+}, 100);
     const status = document.getElementById('status');
     status.style.position = 'static';
     status.style.marginTop = '10px';
