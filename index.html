@@ -268,7 +268,7 @@ let conn, time = 0, timer = null, inputBuffer = "";
 let savedBuffer = "";
 let editing = false;
     let wakeLock = null;
-    let slaveTime = null;
+   let slaveTimes = {};
     let lastBlinkSecond = -1;
 function updateConnDot() {
 
@@ -442,20 +442,21 @@ checkSlaveDiff();
 
     function checkSlaveDiff() {
 if (Date.now() < ignoreDiffUntil) return;
-    if (slaveTime === null) return;
+   if (Object.keys(slaveTimes).length === 0) return;
+   const alertEl = document.getElementById('slaveAlert');
+const timeEl  = document.getElementById('slaveTimeText');
 
-    const diff = Math.abs(time - slaveTime);
+const hasError = Object.values(slaveTimes).some(
+    t => Math.abs(time - t) >= 3
+);
 
-    const alertEl = document.getElementById('slaveAlert');
-    const timeEl  = document.getElementById('slaveTimeText');
-
-    if (diff >= 3) {
-        alertEl.style.color = "#ff3030";
-        timeEl.style.color = "#ff3030";
-    } else {
-        alertEl.style.color = "#555";
-        timeEl.style.color = "#666";
-    }
+if (hasError) {
+    alertEl.style.color = "#ff3030";
+    timeEl.style.color = "#ff3030";
+} else {
+    alertEl.style.color = "#555";
+    timeEl.style.color = "#666";
+}
 }
     function resetTimer() { 
 if (timer) return;
@@ -522,6 +523,7 @@ conn.on('data', data => {
     conns.push(c);
 c.on('close', () => {
     conns = conns.filter(x => x !== c);
+    slaveTimes[c.peer] = -999999;
 });
     showControls();
     setStatus("CONNECTED", "status-connected");
@@ -536,11 +538,13 @@ c.on('close', () => {
 
        if(data.type === 'slaveTime') {
 
-    slaveTime = data.value;
+  slaveTimes[c.peer] = data.value;
 
-    const h = Math.floor(slaveTime / 3600);
-    const m = Math.floor((slaveTime % 3600) / 60);
-    const s = slaveTime % 60;
+const slaveTime = data.value;
+
+const h = Math.floor(slaveTime / 3600);
+const m = Math.floor((slaveTime % 3600) / 60);
+const s = slaveTime % 60;
 
     document.getElementById('slaveTimeText').innerText =
     String(h).padStart(2,'0') + ":" +
