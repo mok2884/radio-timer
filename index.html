@@ -523,7 +523,7 @@ conn.on('data', data => {
     conns.push(c);
 c.on('close', () => {
     conns = conns.filter(x => x !== c);
-    slaveTimes[c.peer] = -999999;
+   delete slaveTimes[c.peer];
 });
     showControls();
     setStatus("CONNECTED", "status-connected");
