@@ -648,7 +648,7 @@ document.querySelectorAll('.separator').forEach(s => {
     
     const displayGroup = document.getElementById('displayGroup');
 
-    function autoScaleSlave() {
+    function autoScaleCue() {
 
         displayGroup.style.transform =
             'scale(1)';
@@ -670,10 +670,10 @@ document.querySelectorAll('.separator').forEach(s => {
 
     }
 
-    window.addEventListener('load', autoScaleSlave);
-    window.addEventListener('resize', autoScaleSlave);
+    window.addEventListener('load', autoScaleCue);
+window.addEventListener('resize', autoScaleCue);
 
-    setTimeout(autoScaleSlave, 100);
+    setTimeout(autoScaleCue, 100);
 
     displayGroup.style.transformOrigin = 'center center';
     displayGroup.style.display = 'flex';
