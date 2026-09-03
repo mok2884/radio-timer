@@ -145,6 +145,20 @@
 #cueRemain {
     font-size: 44px;
 }
+    .eventBtn {
+    height: 40px !important;
+    padding: 4px;
+    font-size: 18px !important;
+    font-weight: 900;
+}
+
+.cueClearBtn {
+    grid-column: 1 / 4;
+    height: 40px !important;
+    padding: 4px;
+    font-size: 18px !important;
+    font-weight: 900;
+}
 </style>
 </head>
 <body>
@@ -203,6 +217,10 @@
             <button onclick="clearInput()" class="action-btn">CLR</button>
             <button onclick="press(0)">0</button>
             <button onclick="setTimer()" class="setBtn" style="font-size: 16px;">TIME SET</button>
+            <button class="eventBtn" type="button">CM入</button>
+<button class="eventBtn" type="button">曲入</button>
+<button class="eventBtn" type="button">戻り</button>
+<button class="cueClearBtn" type="button">CUEクリア</button>
         </div>
 <div class="rightPanel">
     <button class="resetBtn" onclick="resetTimer()">set ZERO</button>
