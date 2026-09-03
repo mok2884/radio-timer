@@ -489,15 +489,12 @@ function setCueCM() {
     });
 }
     function clearCue() {
+
     document.getElementById('cueMasterLabel').innerText = '--';
     document.getElementById('cueMasterTime').innerText = '--:--:--';
 
-    conns.forEach(c => {
-        if (c.open) {
-            c.send({
-                type: 'cueClear'
-            });
-        }
+    sendToAll({
+        type: 'cueClear'
     });
 }
     function setTimer() {
