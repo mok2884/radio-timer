@@ -492,8 +492,12 @@ function setCueCM() {
     document.getElementById('cueMasterLabel').innerText = '--';
     document.getElementById('cueMasterTime').innerText = '--:--:--';
 
-    sendToAll({
-        type: 'cueClear'
+    conns.forEach(c => {
+        if (c.open) {
+            c.send({
+                type: 'cueClear'
+            });
+        }
     });
 }
     function setTimer() {
@@ -721,6 +725,7 @@ conn.on('data', data => {
         d.slice(4,6);
 }
 if (data.type === 'cueClear') {
+    console.log('CUE CLEAR RECEIVED');
     cueTargetTime = null;
 
     document.getElementById('cueLabel').innerText = '--';
