@@ -669,11 +669,11 @@ const display = document.getElementById('display');
         const scaleY =
             (window.innerHeight * 0.88) / rect.height;
 
-        const scale =
-            Math.min(scaleX, scaleY);
+       const scale =
+    Math.min(scaleX, scaleY) * 0.7;
 
-        displayGroup.style.transform =
-            `scale(${scale})`;
+displayGroup.style.transform =
+    `scale(${scale})`;
     }
 
     window.addEventListener('load', autoScaleCue);
