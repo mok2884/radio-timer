@@ -260,7 +260,7 @@
     <button class="eventBtn" type="button" onclick="setCueCM()">CM入</button>
     <button class="eventBtn" type="button" onclick="setCueSong()">曲入</button>
     <button class="eventBtn" type="button" onclick="setCueReturn()">戻り</button>
-    <button class="cueClearBtn" type="button">CUEクリア</button>
+    <button class="cueClearBtn" type="button" onclick="clearCue()">CUEクリア</button>
 </div>
 <div id="slaveMonitor"
      style="
@@ -488,6 +488,14 @@ function setCueCM() {
         value: inputBuffer
     });
 }
+    function clearCue() {
+    document.getElementById('cueMasterLabel').innerText = '--';
+    document.getElementById('cueMasterTime').innerText = '--:--:--';
+
+    sendToAll({
+        type: 'cueClear'
+    });
+}
     function setTimer() {
         if (timer) return;
         if(inputBuffer.length === 0) return;
@@ -712,7 +720,13 @@ conn.on('data', data => {
         d.slice(2,4) + ':' +
         d.slice(4,6);
 }
+if (data.type === 'cueClear') {
+    cueTargetTime = null;
 
+    document.getElementById('cueLabel').innerText = '--';
+    document.getElementById('cueTargetTime').innerText = '--:--:--';
+    document.getElementById('cueRemain').innerText = '--:--';
+}
     if (data.type === 'time') {
     if (data.seq < lastSeq) return;
     lastSeq = data.seq;
