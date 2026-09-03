@@ -258,8 +258,8 @@
 </div>
 <div class="cueButtons">
     <button class="eventBtn" type="button" onclick="setCueCM()">CM入</button>
-    <button class="eventBtn" type="button">曲入</button>
-    <button class="eventBtn" type="button">戻り</button>
+    <button class="eventBtn" type="button" onclick="setCueSong()">曲入</button>
+    <button class="eventBtn" type="button" onclick="setCueReturn()">戻り</button>
     <button class="cueClearBtn" type="button">CUEクリア</button>
 </div>
 <div id="slaveMonitor"
@@ -452,6 +452,42 @@ function setCueCM() {
         value: inputBuffer
     });
 }
+    function setCueSong() {
+
+    if (inputBuffer.length === 0) return;
+
+    const d = inputBuffer.padStart(6, '0');
+
+    document.getElementById('cueMasterLabel').innerText = '曲入り';
+
+    document.getElementById('cueMasterTime').innerText =
+        d.slice(0,2) + ':' +
+        d.slice(2,4) + ':' +
+        d.slice(4,6);
+
+    sendToAll({
+        type: 'cueSong',
+        value: inputBuffer
+    });
+}
+    function setCueReturn() {
+
+    if (inputBuffer.length === 0) return;
+
+    const d = inputBuffer.padStart(6, '0');
+
+    document.getElementById('cueMasterLabel').innerText = '戻り';
+
+    document.getElementById('cueMasterTime').innerText =
+        d.slice(0,2) + ':' +
+        d.slice(2,4) + ':' +
+        d.slice(4,6);
+
+    sendToAll({
+        type: 'cueReturn',
+        value: inputBuffer
+    });
+}
     function setTimer() {
         if (timer) return;
         if(inputBuffer.length === 0) return;
@@ -637,6 +673,38 @@ conn.on('data', data => {
     const s = parseInt(d.slice(4,6));
 
     cueTargetTime = h * 3600 + m * 60 + s;
+
+    document.getElementById('cueTargetTime').innerText =
+        d.slice(0,2) + ':' +
+        d.slice(2,4) + ':' +
+        d.slice(4,6);
+}
+    if (data.type === 'cueSong') {
+    const d = String(data.value).padStart(6, '0');
+
+    const h = parseInt(d.slice(0,2));
+    const m = parseInt(d.slice(2,4));
+    const s = parseInt(d.slice(4,6));
+
+    cueTargetTime = h * 3600 + m * 60 + s;
+
+    document.getElementById('cueLabel').innerText = '曲入り';
+
+    document.getElementById('cueTargetTime').innerText =
+        d.slice(0,2) + ':' +
+        d.slice(2,4) + ':' +
+        d.slice(4,6);
+}
+    if (data.type === 'cueReturn') {
+    const d = String(data.value).padStart(6, '0');
+
+    const h = parseInt(d.slice(0,2));
+    const m = parseInt(d.slice(2,4));
+    const s = parseInt(d.slice(4,6));
+
+    cueTargetTime = h * 3600 + m * 60 + s;
+
+    document.getElementById('cueLabel').innerText = '戻り';
 
     document.getElementById('cueTargetTime').innerText =
         d.slice(0,2) + ':' +
