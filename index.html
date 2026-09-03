@@ -181,6 +181,23 @@
     font-weight: 900;
     margin: 0;
 }
+
+    #cueMasterInfo {
+    width: 100%;
+    box-sizing: border-box;
+    border: 2px solid #FFFFFF;
+    border-radius: 8px;
+    padding: 8px 12px;
+    margin-top: 16px;
+    margin-bottom: 0;
+    font-family: 'Roboto', sans-serif;
+    font-size: 24px;
+    font-weight: 900;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 30px;
+}
 </style>
 </head>
 <body>
@@ -248,7 +265,10 @@
     </div>
 
 </div>
-
+<div id="cueMasterInfo">
+    <span id="cueMasterLabel">CM入り</span>
+    <span id="cueMasterTime">--:--:--</span>
+</div>
 <div class="cueButtons">
     <button class="eventBtn" type="button">CM入</button>
     <button class="eventBtn" type="button">曲入</button>
