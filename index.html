@@ -446,6 +446,10 @@ function setCueCM() {
         d.slice(0,2) + ':' +
         d.slice(2,4) + ':' +
         d.slice(4,6);
+     sendToAll({
+        type: 'cueCM',
+        value: inputBuffer
+    });
 }
     function setTimer() {
         if (timer) return;
@@ -623,6 +627,16 @@ if (timer) return;
 let lastSeq = -1;
 
 conn.on('data', data => {
+
+    if (data.type === 'cueCM') {
+        const d = String(data.value).padStart(6, '0');
+
+        document.getElementById('cueTargetTime').innerText =
+            d.slice(0,2) + ':' +
+            d.slice(2,4) + ':' +
+            d.slice(4,6);
+    }
+
     if (data.type === 'time') {
         if (data.seq < lastSeq) return;
         lastSeq = data.seq;
@@ -672,6 +686,14 @@ c.on('close', () => {
         setTimeout(updateConnDot, 1000);
 
     c.on('data', data => {
+        if(data.type === 'cueCM') {
+    const d = String(data.value).padStart(6, '0');
+
+    document.getElementById('cueTargetTime').innerText =
+        d.slice(0,2) + ':' +
+        d.slice(2,4) + ':' +
+        d.slice(4,6);
+}
 
         if(data.type === 'time') {
             time = data.value;
