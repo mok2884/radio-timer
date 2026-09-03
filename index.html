@@ -117,6 +117,34 @@
     cursor: not-allowed;
     opacity: 0.6;
 }
+#cueInfo {
+    display: none;
+    width: 100%;
+    margin-top: 10px;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 900;
+}
+
+#cueLabel {
+    text-align: left;
+    font-size: 28px;
+    margin-bottom: 4px;
+}
+
+#cueTimeRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    width: 100%;
+}
+
+#cueTargetTime {
+    font-size: 30px;
+}
+
+#cueRemain {
+    font-size: 44px;
+}
 </style>
 </head>
 <body>
@@ -148,6 +176,13 @@
 </div>
 <div id="slaveLabel">
     REAL TIME / TIMER
+</div>
+    <div id="cueInfo">
+    <div id="cueLabel">CM入り</div>
+    <div id="cueTimeRow">
+        <span id="cueTargetTime">22:45:45</span>
+        <span id="cueRemain">2:34</span>
+    </div>
 </div>
         <div id="status" class="status-unlink">UNLINK</div>
         </div>
@@ -648,6 +683,7 @@ document.querySelectorAll('.separator').forEach(s => {
 
     const displayGroup = document.getElementById('displayGroup');
 const display = document.getElementById('display');
+       document.getElementById('cueInfo').style.display = 'block';
 
     displayGroup.style.transformOrigin = 'center center';
     displayGroup.style.display = 'flex';
