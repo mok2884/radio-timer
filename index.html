@@ -648,6 +648,12 @@ document.querySelectorAll('.separator').forEach(s => {
 
     const displayGroup = document.getElementById('displayGroup');
 
+    displayGroup.style.transformOrigin = 'center center';
+    displayGroup.style.display = 'flex';
+    displayGroup.style.flexDirection = 'column';
+    displayGroup.style.alignItems = 'center';
+    displayGroup.style.width = 'max-content';
+
     function autoScaleCue() {
 
         displayGroup.style.transform = 'scale(1)';
@@ -671,11 +677,6 @@ document.querySelectorAll('.separator').forEach(s => {
     window.addEventListener('resize', autoScaleCue);
 
     setTimeout(autoScaleCue, 100);
-
-    displayGroup.style.transformOrigin = 'center center';
-    displayGroup.style.display = 'flex';
-    displayGroup.style.flexDirection = 'column';
-    displayGroup.style.alignItems = 'center';
 
     document.querySelectorAll('.digit').forEach(d => {
         d.style.margin = '0 12px';
