@@ -213,6 +213,16 @@
 <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script>
     const role = new URLSearchParams(window.location.search).get('role');
+    window.addEventListener('DOMContentLoaded', () => {
+
+    if (role === 'cue') {
+
+        document.getElementById('slaveLabel').innerText =
+            'TARGET TIME';
+
+    }
+
+});
    if (role === 'master') {
     const display = document.getElementById('display');
     const status = document.getElementById('status');
@@ -408,6 +418,31 @@ if (role === 'slave') {
     }
 }
 
+if (role === 'cue') {
+
+    if (time !== lastBlinkSecond) {
+
+        lastBlinkSecond = time;
+
+        document.querySelectorAll('.separator').forEach(s => {
+
+            s.style.opacity = '1';
+            s.style.color = '#ff2222';
+            s.style.textShadow =
+                '0 0 8px rgba(255,0,0,0.9), 0 0 16px rgba(255,0,0,0.55)';
+        });
+
+        setTimeout(() => {
+
+            document.querySelectorAll('.separator').forEach(s => {
+                s.style.opacity = '0.2';
+                s.style.textShadow = 'none';
+            });
+
+        }, 500);
+    }
+}
+
 checkSlaveDiff();
 }
 
@@ -517,6 +552,17 @@ conn.on('data', data => {
         }, { once: true });
     }
 });
+    peer.on('open', () => {
+    if (role === 'cue') {
+        const overlay = document.getElementById('tapToConnect');
+        overlay.style.display = 'flex';
+
+        overlay.addEventListener('click', () => {
+            overlay.style.display = 'none';
+            connectToMaster();
+        }, { once: true });
+    }
+});
     peer.on('connection', c => {
     conn = c;
     conns.push(c);
@@ -573,6 +619,55 @@ if (role === 'slave') {
 
         displayGroup.style.transform =
             `rotate(90deg) scale(${scale})`;
+    }
+
+    window.addEventListener('load', autoScaleSlave);
+    window.addEventListener('resize', autoScaleSlave);
+
+    setTimeout(autoScaleSlave, 100);
+
+    displayGroup.style.transformOrigin = 'center center';
+    displayGroup.style.display = 'flex';
+    displayGroup.style.flexDirection = 'column';
+    displayGroup.style.alignItems = 'center';
+    document.querySelectorAll('.digit').forEach(d => {
+d.style.margin = '0 12px';
+});
+document.querySelectorAll('.separator').forEach(s => {
+    s.style.fontSize = '1.0em';   // お好みで 1.05em や 1.1em
+    s.style.width = '52px';
+    s.style.fontWeight = '900';
+});
+
+    
+    const status = document.getElementById('status');
+    status.style.position = 'static';
+    status.style.marginTop = '10px';
+}
+    if (role === 'cue') {
+    
+    const displayGroup = document.getElementById('displayGroup');
+
+    function autoScaleSlave() {
+
+        displayGroup.style.transform =
+            'scale(1)';
+
+        const rect =
+            displayGroup.getBoundingClientRect();
+
+        const scaleX =
+            (window.innerHeight * 0.88) / rect.width;
+
+        const scaleY =
+            (window.innerWidth * 0.88) / rect.height;
+
+        const scale =
+            Math.min(scaleX, scaleY);
+
+        displayGroup.style.transform =
+            `scale(${scale})`;
+
     }
 
     window.addEventListener('load', autoScaleSlave);
