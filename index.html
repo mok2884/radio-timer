@@ -257,7 +257,7 @@
     <span id="cueMasterTime">--:--:--</span>
 </div>
 <div class="cueButtons">
-    <button class="eventBtn" type="button">CM入</button>
+    <button class="eventBtn" type="button" onclick="setCueCM()">CM入</button>
     <button class="eventBtn" type="button">曲入</button>
     <button class="eventBtn" type="button">戻り</button>
     <button class="cueClearBtn" type="button">CUEクリア</button>
@@ -436,7 +436,17 @@ function updateConnDot() {
     document.getElementById('inputPreview').innerText =
         d.slice(0,2) + ":" + d.slice(2,4) + ":" + d.slice(4,6);
 }
+function setCueCM() {
 
+    const h = Math.floor(time / 3600);
+    const m = Math.floor((time % 3600) / 60);
+    const s = time % 60;
+
+    document.getElementById('cueMasterTime').innerText =
+        String(h).padStart(2, '0') + ':' +
+        String(m).padStart(2, '0') + ':' +
+        String(s).padStart(2, '0');
+}
     function setTimer() {
         if (timer) return;
         if(inputBuffer.length === 0) return;
