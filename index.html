@@ -368,6 +368,7 @@ let editing = false;
     let wakeLock = null;
     let slaveTime = null;
     let lastBlinkSecond = -1;
+    let cueTargetTime = null;
 function updateConnDot() {
 
     if (!conn || !conn.peerConnection) return;
@@ -628,28 +629,47 @@ let lastSeq = -1;
 
 conn.on('data', data => {
 
-    if (data.type === 'cueCM') {
-        const d = String(data.value).padStart(6, '0');
+   if (data.type === 'cueCM') {
+    const d = String(data.value).padStart(6, '0');
 
-        document.getElementById('cueTargetTime').innerText =
-            d.slice(0,2) + ':' +
-            d.slice(2,4) + ':' +
-            d.slice(4,6);
-    }
+    const h = parseInt(d.slice(0,2));
+    const m = parseInt(d.slice(2,4));
+    const s = parseInt(d.slice(4,6));
+
+    cueTargetTime = h * 3600 + m * 60 + s;
+
+    document.getElementById('cueTargetTime').innerText =
+        d.slice(0,2) + ':' +
+        d.slice(2,4) + ':' +
+        d.slice(4,6);
+}
 
     if (data.type === 'time') {
-        if (data.seq < lastSeq) return;
-        lastSeq = data.seq;
+    if (data.seq < lastSeq) return;
+    lastSeq = data.seq;
 
-        time = data.value;
-        updateDisplay();
-        if (conn) {
-    conn.send({
-        type: 'slaveTime',
-        value: time
-    });
-}
+    time = data.value;
+    updateDisplay();
+
+    if (cueTargetTime !== null) {
+        const remain = cueTargetTime - time;
+
+        const minutes = Math.floor(Math.abs(remain) / 60);
+        const seconds = Math.abs(remain) % 60;
+
+        document.getElementById('cueRemain').innerText =
+            (remain < 0 ? '-' : '') +
+            String(minutes).padStart(2, '0') + ':' +
+            String(seconds).padStart(2, '0');
     }
+
+    if (conn) {
+        conn.send({
+            type: 'slaveTime',
+            value: time
+        });
+    }
+}
 });
         conn.on('close', () => { setStatus("UNLINK", "status-unlink"); setTimeout(connectToMaster, 3000); });
     }
