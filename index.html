@@ -673,6 +673,7 @@ conn.on('data', data => {
     const s = parseInt(d.slice(4,6));
 
     cueTargetTime = h * 3600 + m * 60 + s;
+       document.getElementById('cueLabel').innerText = 'CM入り';
 
     document.getElementById('cueTargetTime').innerText =
         d.slice(0,2) + ':' +
