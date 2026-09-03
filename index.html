@@ -654,13 +654,19 @@ conn.on('data', data => {
     if (cueTargetTime !== null) {
         const remain = cueTargetTime - time;
 
-        const minutes = Math.floor(Math.abs(remain) / 60);
-        const seconds = Math.abs(remain) % 60;
+if (remain <= 0) {
+    cueTargetTime = null;
 
-        document.getElementById('cueRemain').innerText =
-            (remain < 0 ? '-' : '') +
-            String(minutes).padStart(2, '0') + ':' +
-            String(seconds).padStart(2, '0');
+    document.getElementById('cueTargetTime').innerText = '--:--:--';
+    document.getElementById('cueRemain').innerText = '--:--';
+} else {
+    const minutes = Math.floor(remain / 60);
+    const seconds = remain % 60;
+
+    document.getElementById('cueRemain').innerText =
+        String(minutes).padStart(2, '0') + ':' +
+        String(seconds).padStart(2, '0');
+}
     }
 
     if (conn) {
