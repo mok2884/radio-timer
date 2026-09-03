@@ -647,12 +647,15 @@ document.querySelectorAll('.separator').forEach(s => {
    if (role === 'cue') {
 
     const displayGroup = document.getElementById('displayGroup');
+const display = document.getElementById('display');
 
     displayGroup.style.transformOrigin = 'center center';
     displayGroup.style.display = 'flex';
     displayGroup.style.flexDirection = 'column';
     displayGroup.style.alignItems = 'center';
-    displayGroup.style.width = 'max-content';
+
+    display.style.marginLeft = 'auto';
+    display.style.marginRight = 'auto';
 
     function autoScaleCue() {
 
