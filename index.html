@@ -166,9 +166,9 @@
     font-size: 18px !important;
     font-weight: 900;
 }
-    .cueButtons {
+   .cueButtons {
     display: grid;
-    grid-template-columns: repeat(3, 86.67px) 120px;
+    grid-template-columns: repeat(3, 86.67px) 120px 70px;
     gap: 10px;
     margin-top: 16px;
 }
@@ -191,6 +191,29 @@
 
     #cueMasterInfo {
    
+}
+    #timerLock {
+    width: 70px;
+    height: 50px;
+    padding: 0;
+    background: #334155;
+    color: #94a3b8;
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: 900;
+}
+
+#timerLockDot {
+    margin-right: 2px;
+}
+
+#timerLockTrack {
+    font-size: 16px;
+}
+
+#timerLock.locked {
+    background: #475569;
+    color: #FFF02A;
 }
 </style>
 </head>
@@ -268,6 +291,11 @@
     <button class="eventBtn" type="button" onclick="setCueSong()">曲入</button>
     <button class="eventBtn" type="button" onclick="setCueReturn()">戻り</button>
     <button class="cueClearBtn" type="button" onclick="clearCue()">CUEクリア</button>
+
+    <button id="timerLock" type="button" onclick="toggleTimerLock()">
+        <span id="timerLockDot">●</span>
+        <span id="timerLockTrack">━━○</span>
+    </button>
 </div>
 <div id="slaveMonitor"
      style="
@@ -376,6 +404,7 @@ let editing = false;
     let slaveTime = null;
     let lastBlinkSecond = -1;
     let cueTargetTime = null;
+    let timerLocked = false;
 function updateConnDot() {
 
     if (!conn || !conn.peerConnection) return;
@@ -604,7 +633,9 @@ if (role === 'cue') {
 checkSlaveDiff();
 }
 
-    function toggleTimer() {
+   function toggleTimer() {
+
+    if (timerLocked) return;
 
     const resetBtn = document.querySelector('.resetBtn');
     const setBtn = document.querySelector('.setBtn');
@@ -630,6 +661,22 @@ checkSlaveDiff();
         // ボタンを暗くする
         resetBtn.classList.add('disabled');
         setBtn.classList.add('disabled');
+    }
+}
+    function toggleTimerLock() {
+
+    timerLocked = !timerLocked;
+
+    const lock = document.getElementById('timerLock');
+
+    if (timerLocked) {
+        lock.classList.add('locked');
+        document.getElementById('timerLockDot').innerText = '○';
+        document.getElementById('timerLockTrack').innerText = '━━●';
+    } else {
+        lock.classList.remove('locked');
+        document.getElementById('timerLockDot').innerText = '●';
+        document.getElementById('timerLockTrack').innerText = '━━○';
     }
 }
 
