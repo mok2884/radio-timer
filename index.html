@@ -149,6 +149,9 @@
     font-size: 50px;
     font-weight: 700;
 }
+    .cueInactive {
+    color: #64748B !important;
+}
     .eventBtn {
     height: 50px !important;
     padding: 4px;
@@ -221,11 +224,11 @@
 <div id="slaveLabel">
     REAL TIME / TIMER
 </div>
-   <div id="cueInfo">
-    <div id="cueLabel">--</div>
+  <div id="cueInfo">
+    <div id="cueLabel" class="cueInactive">--</div>
     <div id="cueTimeRow">
-        <span id="cueTargetTime">--:--:--</span>
-        <span id="cueRemain">--:--</span>
+        <span id="cueTargetTime" class="cueInactive">--:--:--</span>
+        <span id="cueRemain" class="cueInactive">--:--</span>
     </div>
 </div>
         <div id="status" class="status-unlink">UNLINK</div>
@@ -742,9 +745,9 @@ if (data.type === 'cueClear') {
     document.getElementById('cueTargetTime').innerText = '--:--:--';
     document.getElementById('cueRemain').innerText = '--:--';
 
-    document.getElementById('cueLabel').style.color = '#94A3B8';
-document.getElementById('cueTargetTime').style.color = '#94A3B8';
-document.getElementById('cueRemain').style.color = '#94A3B8';
+    document.getElementById('cueLabel').style.color = '#64748B';
+document.getElementById('cueTargetTime').style.color = '#64748B';
+document.getElementById('cueRemain').style.color = '#64748B';
 }
     if (data.type === 'time') {
     if (data.seq < lastSeq) return;
