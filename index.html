@@ -743,7 +743,8 @@ if (data.type === 'cueClear') {
     document.getElementById('cueRemain').innerText = '--:--';
 
     document.getElementById('cueLabel').style.color = '#94A3B8';
-    document.getElementById('cueRemain').style.color = '#94A3B8';
+document.getElementById('cueTargetTime').style.color = '#94A3B8';
+document.getElementById('cueRemain').style.color = '#94A3B8';
 }
     if (data.type === 'time') {
     if (data.seq < lastSeq) return;
