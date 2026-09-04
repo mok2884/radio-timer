@@ -690,6 +690,8 @@ conn.on('data', data => {
 
     cueTargetTime = h * 3600 + m * 60 + s;
        document.getElementById('cueLabel').innerText = 'CM入り';
+       document.getElementById('cueLabel').style.color = '#5EEAD4';
+document.getElementById('cueRemain').style.color = '#5EEAD4';
 
     document.getElementById('cueTargetTime').innerText =
         d.slice(0,2) + ':' +
@@ -706,6 +708,8 @@ conn.on('data', data => {
     cueTargetTime = h * 3600 + m * 60 + s;
 
     document.getElementById('cueLabel').innerText = '曲入り';
+        document.getElementById('cueLabel').style.color = '#5EEAD4';
+document.getElementById('cueRemain').style.color = '#5EEAD4';
 
     document.getElementById('cueTargetTime').innerText =
         d.slice(0,2) + ':' +
@@ -722,6 +726,8 @@ conn.on('data', data => {
     cueTargetTime = h * 3600 + m * 60 + s;
 
     document.getElementById('cueLabel').innerText = 'スタジオ戻り';
+        document.getElementById('cueLabel').style.color = '#FFD400';
+document.getElementById('cueRemain').style.color = '#FFD400';
 
     document.getElementById('cueTargetTime').innerText =
         d.slice(0,2) + ':' +
@@ -735,6 +741,9 @@ if (data.type === 'cueClear') {
     document.getElementById('cueLabel').innerText = '--';
     document.getElementById('cueTargetTime').innerText = '--:--:--';
     document.getElementById('cueRemain').innerText = '--:--';
+
+    document.getElementById('cueLabel').style.color = '#e2e8f0';
+    document.getElementById('cueRemain').style.color = '#e2e8f0';
 }
     if (data.type === 'time') {
     if (data.seq < lastSeq) return;
