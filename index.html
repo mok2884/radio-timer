@@ -446,7 +446,8 @@ let editing = false;
     let slaveTime = null;
     let lastBlinkSecond = -1;
     let cueTargetTime = null;
-    let timerLocked = false;
+let cueMasterTargetTime = null;
+let timerLocked = false;
 function updateConnDot() {
 
     if (!conn || !conn.peerConnection) return;
@@ -520,6 +521,9 @@ function setCueCM() {
     if (inputBuffer.length === 0) return;
 
     const d = inputBuffer.padStart(6, '0');
+    cueMasterTargetTime = parseInt(d.slice(0,2)) * 3600 +
+                      parseInt(d.slice(2,4)) * 60 +
+                      parseInt(d.slice(4,6));
 
     document.getElementById('cueMasterLabel').innerText = 'CM入り';
 
@@ -540,6 +544,9 @@ document.getElementById('cueMasterTime').style.color = '#CBD5E1';
     if (inputBuffer.length === 0) return;
 
     const d = inputBuffer.padStart(6, '0');
+        cueMasterTargetTime = parseInt(d.slice(0,2)) * 3600 +
+                      parseInt(d.slice(2,4)) * 60 +
+                      parseInt(d.slice(4,6));
 
     document.getElementById('cueMasterLabel').innerText = '曲入り';
 
@@ -560,6 +567,9 @@ document.getElementById('cueMasterTime').style.color = '#CBD5E1';
     if (inputBuffer.length === 0) return;
 
     const d = inputBuffer.padStart(6, '0');
+        cueMasterTargetTime = parseInt(d.slice(0,2)) * 3600 +
+                      parseInt(d.slice(2,4)) * 60 +
+                      parseInt(d.slice(4,6));
 
     document.getElementById('cueMasterLabel').innerText = 'スタジオ戻り';
 
@@ -575,7 +585,7 @@ document.getElementById('cueMasterTime').style.color = '#CBD5E1';
     });
 }
     function clearCue() {
-
+cueMasterTargetTime = null;
     document.getElementById('cueMasterLabel').innerText = '--';
     document.getElementById('cueMasterTime').innerText = '--:--:--';
        document.getElementById('cueMasterLabel').style.color = '#64748B';
@@ -701,11 +711,16 @@ checkSlaveDiff();
         startTime = Date.now() - (time * 1000);
 
         timer = setInterval(() => {
-            time = Math.floor((Date.now() - startTime) / 1000);
-            updateDisplay();
-           sendToAll({type: 'time', value: time, seq: seq++});
+    time = Math.floor((Date.now() - startTime) / 1000);
+    updateDisplay();
 
-        }, 100);
+    if (cueMasterTargetTime !== null && time >= cueMasterTargetTime) {
+        clearCue();
+    }
+
+    sendToAll({type: 'time', value: time, seq: seq++});
+
+}, 100);
 
         // ボタンを暗くする
         resetBtn.classList.add('disabled');
