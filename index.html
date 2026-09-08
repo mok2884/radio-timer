@@ -712,19 +712,27 @@ checkSlaveDiff();
         setBtn.classList.add('disabled');
     }
 }
-    function toggleTimerLock() {
+   function toggleTimerLock() {
 
     timerLocked = !timerLocked;
 
     const lock = document.getElementById('timerLock');
+    const startBtn = document.querySelector('.startBtn');
 
     if (timerLocked) {
-    lock.classList.add('locked');
-    document.getElementById('timerLockIcon').classList.add('lockedIcon');
-} else {
-    lock.classList.remove('locked');
-    document.getElementById('timerLockIcon').classList.remove('lockedIcon');
-}
+        lock.classList.add('locked');
+        document.getElementById('timerLockIcon').classList.add('lockedIcon');
+
+        startBtn.style.background = '#64707A';
+        startBtn.style.color = '#CBD5E1';
+
+    } else {
+        lock.classList.remove('locked');
+        document.getElementById('timerLockIcon').classList.remove('lockedIcon');
+
+        startBtn.style.background = '#f8f8f4';
+        startBtn.style.color = '#000';
+    }
 }
 
     function checkSlaveDiff() {
