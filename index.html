@@ -226,7 +226,7 @@
     display: inline-block;
     width: 18px;
     height: 15px;
-    border: 2px solid currentColor;
+    border: 3px solid currentColor;
     border-radius: 2px;
     box-sizing: border-box;
     margin-top: 5px;
@@ -236,23 +236,28 @@
     content: "";
     position: absolute;
     left: 3px;
-    top: -10px;
-    width: 8px;
-    height: 10px;
-    border: 2px solid currentColor;
+    top: -11px;
+    width: 9px;
+    height: 11px;
+    border: 3px solid currentColor;
     border-bottom: none;
     border-radius: 8px 8px 0 0;
     box-sizing: border-box;
+}
+
+#timerLockIcon.lockedIcon::before {
+    transform: translateX(0);
+}
+
+#timerLockIcon:not(.lockedIcon)::before {
+    transform: translateX(7px);
 }
 
 #timerLock.locked {
     background: #475569;
     color: #FFF02A;
 }
-#timerLockIcon.lockedIcon::before {
-    transform: translateX(5px) rotate(20deg);
-    transform-origin: left bottom;
-}
+
     
 </style>
 </head>
