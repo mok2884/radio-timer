@@ -189,10 +189,10 @@
     margin: 0;
 }
 
-    #cueMasterInfo {
+   #cueMasterInfo {
     width: 94%;
-    height: 78px;
-    margin: 10px auto 0;
+    height: 40px;
+    margin: 6px auto 0;
     display: flex;
     justify-content: space-between;
     align-items: baseline;
@@ -201,12 +201,12 @@
 }
 
 #cueMasterLabel {
-    font-size: 38px;
+    font-size: 20px;
     font-weight: 600;
 }
 
 #cueMasterTime {
-    font-size: 50px;
+    font-size: 26px;
     font-weight: 700;
 }
     #timerLock {
@@ -502,6 +502,8 @@ function setCueCM() {
         d.slice(0,2) + ':' +
         d.slice(2,4) + ':' +
         d.slice(4,6);
+    document.getElementById('cueMasterLabel').style.color = '#20E0D0';
+document.getElementById('cueMasterTime').style.color = '#20E0D0';
 
     sendToAll({
         type: 'cueCM',
@@ -520,6 +522,8 @@ function setCueCM() {
         d.slice(0,2) + ':' +
         d.slice(2,4) + ':' +
         d.slice(4,6);
+        document.getElementById('cueMasterLabel').style.color = '#20E0D0';
+document.getElementById('cueMasterTime').style.color = '#20E0D0';
 
     sendToAll({
         type: 'cueSong',
@@ -538,6 +542,8 @@ function setCueCM() {
         d.slice(0,2) + ':' +
         d.slice(2,4) + ':' +
         d.slice(4,6);
+        document.getElementById('cueMasterLabel').style.color = '#20E0D0';
+document.getElementById('cueMasterTime').style.color = '#20E0D0';
 
     sendToAll({
         type: 'cueReturn',
@@ -548,7 +554,9 @@ function setCueCM() {
 
     document.getElementById('cueMasterLabel').innerText = '--';
     document.getElementById('cueMasterTime').innerText = '--:--:--';
-
+       document.getElementById('cueMasterLabel').style.color = '#64748B';
+document.getElementById('cueMasterTime').style.color = '#64748B';
+        
     sendToAll({
         type: 'cueClear'
     });
