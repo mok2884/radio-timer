@@ -221,18 +221,39 @@
     font-weight: 900;
 }
 
-#timerLockDot {
-    margin-right: 2px;
+#timerLockIcon {
+    position: relative;
+    display: inline-block;
+    width: 18px;
+    height: 15px;
+    border: 2px solid currentColor;
+    border-radius: 2px;
+    box-sizing: border-box;
+    margin-top: 5px;
 }
 
-#timerLockTrack {
-    font-size: 16px;
+#timerLockIcon::before {
+    content: "";
+    position: absolute;
+    left: 3px;
+    top: -10px;
+    width: 8px;
+    height: 10px;
+    border: 2px solid currentColor;
+    border-bottom: none;
+    border-radius: 8px 8px 0 0;
+    box-sizing: border-box;
 }
 
 #timerLock.locked {
     background: #475569;
     color: #FFF02A;
 }
+#timerLockIcon.lockedIcon::before {
+    transform: translateX(5px) rotate(20deg);
+    transform-origin: left bottom;
+}
+    
 </style>
 </head>
 <body>
@@ -311,9 +332,8 @@
     <button class="cueClearBtn" type="button" onclick="clearCue()">CUEクリア</button>
 
     <button id="timerLock" type="button" onclick="toggleTimerLock()">
-        <span id="timerLockDot">●</span>
-        <span id="timerLockTrack">━━○</span>
-    </button>
+    <span id="timerLockIcon"></span>
+</button>
 </div>
 <div id="slaveMonitor"
      style="
@@ -695,14 +715,12 @@ checkSlaveDiff();
     const lock = document.getElementById('timerLock');
 
     if (timerLocked) {
-        lock.classList.add('locked');
-        document.getElementById('timerLockDot').innerText = '○';
-        document.getElementById('timerLockTrack').innerText = '━━●';
-    } else {
-        lock.classList.remove('locked');
-        document.getElementById('timerLockDot').innerText = '●';
-        document.getElementById('timerLockTrack').innerText = '━━○';
-    }
+    lock.classList.add('locked');
+    document.getElementById('timerLockIcon').classList.add('lockedIcon');
+} else {
+    lock.classList.remove('locked');
+    document.getElementById('timerLockIcon').classList.remove('lockedIcon');
+}
 }
 
     function checkSlaveDiff() {
