@@ -901,7 +901,12 @@ if (remain <= 0) {
 });
         conn.on('close', () => { setStatus("UNLINK", "status-unlink"); setTimeout(connectToMaster, 3000); });
     }
-
+peer.on('disconnected', () => {
+    if (role === 'master') {
+        console.log('PeerServer disconnected. Reconnecting...');
+        peer.reconnect();
+    }
+});
    peer.on('open', () => {
     if (role === 'slave') {
         const overlay = document.getElementById('tapToConnect');
