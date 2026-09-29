@@ -1078,6 +1078,38 @@ document.addEventListener('visibilitychange', () => {
         keepScreenAwake();
     }
 });
+    // ---- 親機の状態を保存・復元 ----
+function saveState() {
+  try {
+    localStorage.setItem('timerState', JSON.stringify({
+      running: !!timer, time: time, startTime: startTime
+    }));
+  } catch (e) {}
+}
+if (role === 'master') {
+  const _origToggle = window.toggleTimer;
+  const _origSet = window.setTimer;
+  const _origReset = window.resetTimer;
+  window.toggleTimer = function () { _origToggle(); saveState(); };
+  window.setTimer = function () { _origSet(); saveState(); };
+  window.resetTimer = function () { _origReset(); saveState(); };
+
+  try {
+    const s = JSON.parse(localStorage.getItem('timerState'));
+    if (s) {
+      if (s.running && s.startTime) {
+        time = Math.floor((Date.now() - s.startTime) / 1000);
+        updateDisplay();
+        window.toggleTimer();
+        startTime = s.startTime;
+        saveState();
+      } else {
+        time = s.time || 0;
+        updateDisplay();
+      }
+    }
+  } catch (e) {}
+}
 </script>
 <video autoplay muted loop playsinline width="1" height="1">
     <source src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4" type="video/mp4">
