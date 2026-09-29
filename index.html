@@ -792,7 +792,17 @@ if (timer) return;
 
     function connectToMaster() {
         setStatus("CONNECTING...", "status-connecting");
-        conn = peer.connect(MASTER_ID);
+        slaveTapped = true;
+    if (peer.disconnected || peer.destroyed) { retryConnect('NO SERVER'); return; }
+    const c0 = peer.connect(MASTER_ID);
+    if (!c0) { retryConnect('CONNECT FAIL'); return; }
+    conn = c0;
+    c0.on('error', () => { retryConnect('CONN ERR'); });
+    c0.on('open', () => { clearTimeout(openTimer); });
+    clearTimeout(openTimer);
+    openTimer = setTimeout(() => {
+      if (conn === c0 && !c0.open) { c0.timedOut = true; try { c0.close(); } catch (e) {} retryConnect('TIMEOUT'); }
+    }, 8000);
         conn.on('open', () => { setStatus("CONNECTED", "status-connected"); /* 子機は controls を表示しない */setTimeout(updateConnDot, 1000); });
        let lastUpdateTime = 0;
         let lastReceived = 0;
@@ -899,7 +909,7 @@ if (remain <= 0) {
     }
 }
 });
-        conn.on('close', () => { setStatus("UNLINK", "status-unlink"); setTimeout(connectToMaster, 3000); });
+        conn.on('close', () => { if (c0.timedOut || conn !== c0) return; retryConnect('LINK CLOSED'); });
     }
 peer.on('disconnected', () => {
     if (role === 'master') {
@@ -1078,6 +1088,40 @@ document.addEventListener('visibilitychange', () => {
         keepScreenAwake();
     }
 });
+   
+    // ---- 子機の再接続 ----
+let slaveTapped = false;
+let retryTimer = null;
+let openTimer = null;
+function showErr(msg) {
+  let e = document.getElementById('errMsg');
+  if (!e) {
+    e = document.createElement('div');
+    e.id = 'errMsg';
+    e.style.cssText = 'color:#94a3b8;font-size:14px;margin-top:6px;font-family:monospace;';
+    document.getElementById('displayGroup').appendChild(e);
+  }
+  e.innerText = new Date().toTimeString().slice(0, 8) + ' ' + msg;
+}
+function retryConnect(msg) {
+  showErr(msg);
+  setStatus("UNLINK", "status-unlink");
+  clearTimeout(openTimer);
+  clearTimeout(retryTimer);
+  retryTimer = setTimeout(connectToMaster, 3000);
+}
+if (role === 'slave' || role === 'cue') {
+  peer.on('error', err => { showErr('ERR ' + err.type); });
+  peer.on('disconnected', () => {
+    showErr('SERVER LOST');
+    setTimeout(() => { if (peer.disconnected && !peer.destroyed) peer.reconnect(); }, 1000);
+  });
+  peer.on('open', () => {
+    if (!slaveTapped) return;
+    document.getElementById('tapToConnect').style.display = 'none';
+    if (!conn || !conn.open) connectToMaster();
+  });
+}
     // ---- 親機の状態を保存・復元 ----
 function saveState() {
   try {
