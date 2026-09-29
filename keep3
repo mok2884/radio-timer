@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<link href="https://fonts.cdnfonts.com/css/ds-digital" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700;900&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+    body { margin: 0; font-family: sans-serif; background: #080d16; color: #e2e8f0; display: flex; justify-content: center; align-items: center; height: 100vh; flex-direction: column; overflow: hidden; overscroll-behavior: none;}
+    .container { text-align: center; }
+    
+    #display {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 11rem;
+    font-family: 'DS-Digital', monospace;
+
+    border: 4px solid #FFFFFF;
+    border-radius: 20px;
+
+    padding: 35px 55px;
+    background: #000000;
+
+    margin-bottom: 20px;
+}
+.digit {
+    width: 80px;
+    text-align: right;
+    display: inline-block;
+    margin: 0 10px;
+    font-style: italic;
+    color: #ff4500;
+}
+
+.separator {
+    width: 45px;
+    text-align: center;
+    display: inline-block;
+    color: #ff0000;
+    font-size: 0.8em;
+
+    transform: translateX(6px);
+}
+    
+    .control-row { margin-bottom: 20px; }
+    .control-btn { background: #1e293b; padding: 12px 24px; border: none; border-radius: 8px; color: white; cursor: pointer; margin: 0 5px; }
+    
+    #inputPreview { font-size: 32px; color: #94a3b8; margin-bottom: 10px; font-family: monospace; }
+    
+    .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 280px; margin: 0 auto; }
+    button { padding: 15px; font-size: 18px; border: none; border-radius: 8px; cursor: pointer; background: #334155; color: white; }
+    button:active { transform: scale(0.95); }
+    .action-btn { background: #475569; }
+
+    #status { position: fixed; bottom: 20px; 
+             right: 20px; font-size: 14px; font-weight: bold; padding: 5px 10px; border-radius: 5px; }
+
+
+    .mainRow {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+}
+
+.rightPanel {
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    margin-left: -2px;
+}
+.keypad button{
+    font-size: 24px; font-weight: 900;
+    height: 80px;
+}
+.resetBtn {
+    height: 80px; background: #556577;
+    color: white;
+    font-weight: 900;
+}
+
+.startBtn {
+    height: 225px; /* 75px × 3段分 */
+    background: #f8f8f4;
+    color: #000;
+    font-weight: 900;
+}
+    .status-connected { color: #22c55e; border: 1px solid #22c55e; }
+    .status-connecting { color: #eab308; border: 1px solid #eab308; }
+    .status-unlink { color: #ef4444; border: 1px solid #ef4444; }
+#slaveLabel {
+    font-size: 34px;
+    font-weight: 900;
+    font-family: 'Roboto', sans-serif;
+}
+.setRow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.setBtn {
+    background: #0f766e;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 900;
+    height: 75px;
+    font-size: 18px;
+}
+    .disabled {
+    background: #334155 !important;
+    color: #94a3b8 !important;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+#cueInfo {
+    display: none;
+    width: 94%;
+    height: 78px;
+    margin: 10px auto 0;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 900;
+}
+
+#cueLabel {
+    text-align: left;
+    font-size: 38px;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+#cueTimeRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    width: 100%;
+}
+
+#cueTargetTime {
+    font-size: 34px;
+    font-weight: 600;
+}
+
+#cueRemain {
+    font-size: 50px;
+    font-weight: 700;
+}
+    .cueInactive {
+    color: #64748B;
+}
+    .eventBtn {
+    height: 50px !important;
+    padding: 4px;
+    font-size: 18px !important;
+    font-weight: 900;
+    margin-top: 12px;
+}
+
+.cueClearBtn {
+    height: 50px !important;
+    padding: 4px;
+    font-size: 18px !important;
+    font-weight: 900;
+}
+   .cueButtons {
+    display: grid;
+    grid-template-columns: repeat(3, 86.67px) 100px 70px;
+    gap: 10px;
+    margin-top: 6px;
+}
+
+.cueButtons .eventBtn {
+    height: 50px !important;
+    padding: 4px;
+    font-size: 18px !important;
+    font-weight: 900;
+    margin: 0;
+}
+
+.cueButtons .cueClearBtn {
+    height: 50px !important;
+    padding: 4px;
+    font-size: 15px !important;
+    font-weight: 700;
+    margin: 0;
+}
+
+   #cueMasterInfo {
+    width: 94%;
+    height: 40px;
+    margin: 6px auto 0;
+    display: flex;
+    justify-content: flex-start;
+    align-items: baseline;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 900;
+    gap: 40px;
+}
+
+#cueMasterLabel {
+    font-size: 20px;
+    font-weight: 400;
+}
+
+#cueMasterTime {
+    font-size: 26px;
+    font-weight: 400;
+}
+    #timerLock {
+    width: 70px;
+    height: 50px;
+    padding: 0;
+    background: #334155;
+    color: #94a3b8;
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: 900;
+}
+
+#timerLockIcon {
+    position: relative;
+    display: inline-block;
+    width: 18px;
+    height: 15px;
+    border: 3px solid currentColor;
+    border-radius: 2px;
+    box-sizing: border-box;
+    margin-top: 5px;
+}
+
+#timerLockIcon::before {
+    content: "";
+    position: absolute;
+    left: 3px;
+    top: -11px;
+    width: 9px;
+    height: 11px;
+    border: 3px solid currentColor;
+    border-bottom: none;
+    border-radius: 8px 8px 0 0;
+    box-sizing: border-box;
+}
+
+#timerLockIcon.lockedIcon::before {
+    transform: translateX(0);
+}
+
+#timerLockIcon:not(.lockedIcon)::before {
+    transform: translateX(7px);
+}
+
+#timerLock.locked {
+    background: #6B3F46;
+    color: #DC4C5A;
+}
+    
+</style>
+</head>
+<body>
+<div id="tapToConnect" style="position:fixed; inset:0; background:rgba(15, 23, 42, 0.8); display:none; justify-content:center; align-items:center; z-index:9999; cursor:pointer;">
+    
+    <div id="tapText" style="color:white; font-size:30px; font-weight:bold;" text-align:center;>
+        MASTER READY?<br>
+    → TAP HERE
+    </div>
+
+</div>
+
+<div class="container">
+<div id="displayGroup">
+    <div style="width: 100%; display: flex; justify-content: flex-end;">
+        <button onclick="location.reload()" style="background: #334155; border: 1px solid #475569; color: #cbd5e1; border-radius: 4px; padding: 4px 8px; font-size: 12px; cursor: pointer; margin-bottom: 5px;">RELOAD</button>
+    </div>
+    <div id="display">
+    <span class="digit">0</span>
+    <span class="digit">0</span>
+    <span class="separator">:</span>
+
+    <span class="digit">0</span>
+    <span class="digit">0</span>
+    <span class="separator">:</span>
+
+    <span class="digit">0</span>
+    <span class="digit">0</span>
+</div>
+<div id="slaveLabel">
+    REAL TIME / TIMER
+</div>
+  <div id="cueInfo">
+    <div id="cueLabel" class="cueInactive">--</div>
+    <div id="cueTimeRow">
+        <span id="cueTargetTime" class="cueInactive">--:--:--</span>
+        <span id="cueRemain" class="cueInactive">--:--</span>
+    </div>
+</div>
+        <div id="status" class="status-unlink">UNLINK</div>
+        </div>
+
+    
+    <div id="uiArea" style="display: none;">
+       
+               <div class="setRow">
+    <div id="inputPreview">--:--:--</div>
+   
+</div>
+
+       <div class="mainRow">
+
+    <div class="keypad">
+        <button onclick="press(1)">1</button><button onclick="press(2)">2</button><button onclick="press(3)">3</button>
+        <button onclick="press(4)">4</button><button onclick="press(5)">5</button><button onclick="press(6)">6</button>
+        <button onclick="press(7)">7</button><button onclick="press(8)">8</button><button onclick="press(9)">9</button>
+        <button onclick="clearInput()" class="action-btn">CLR</button>
+        <button onclick="press(0)">0</button>
+        <button onclick="setTimer()" class="setBtn" style="font-size: 16px;">TIME SET</button>
+    </div>
+
+    <div class="rightPanel">
+        <button class="resetBtn" onclick="resetTimer()">set ZERO</button>
+        <button class="startBtn" onclick="toggleTimer()">START / STOP</button>
+    </div>
+
+</div>
+<div id="cueMasterInfo">
+    <span id="cueMasterLabel">CM入り</span>
+    <span id="cueMasterTime">--:--:--</span>
+</div>
+<div class="cueButtons">
+    <button class="eventBtn" type="button" onclick="setCueCM()">CM入</button>
+    <button class="eventBtn" type="button" onclick="setCueSong()">曲入</button>
+    <button class="eventBtn" type="button" onclick="setCueReturn()">戻り</button>
+    <button class="cueClearBtn" type="button" onclick="clearCue()">CUEクリア</button>
+
+    <button id="timerLock" type="button" onclick="toggleTimerLock()">
+    <span id="timerLockIcon"></span>
+</button>
+</div>
+<div id="slaveMonitor"
+     style="
+        text-align:right;
+        margin-top:8px;
+        width:100%;
+        box-sizing:border-box;
+        padding-right:4px;
+        font-family:monospace;
+        font-size:16px;
+    ">
+
+    <span id="slaveAlert"
+          style="
+             color:#555;
+             font-weight:900;
+             margin-right:12px;
+        ">
+        CHECK SLAVE!
+    </span>
+
+    
+<span id="slaveTimeText"
+      style="color:#666;">
+    00:00:00
+</span>
+<span id="connDot" style="margin-left:10px;">●</span>
+
+
+</div>
+
+            
+    </div>
+</div>
+
+
+
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<script>
+    const role = new URLSearchParams(window.location.search).get('role');
+    window.addEventListener('DOMContentLoaded', () => {
+
+    if (role === 'cue') {
+
+        document.getElementById('slaveLabel').innerText =
+            'REAL TIME / TIMER';
+
+    }
+
+});
+   if (role === 'master') {
+    const display = document.getElementById('display');
+    const status = document.getElementById('status');
+       document.querySelector('button[onclick="location.reload()"]').style.display = 'none';
+
+   const container = document.querySelector('.container');
+
+function autoScale() {
+
+    container.style.transform = 'scale(1)';
+
+    const rect = container.getBoundingClientRect();
+
+    const scaleX = (window.innerWidth * 0.92) / rect.width;
+    const scaleY = (window.innerHeight * 0.92) / rect.height;
+
+    const scale = Math.min(scaleX, scaleY);
+
+    container.style.transform = `scale(${scale})`;
+}
+
+window.addEventListener('load', autoScale);
+window.addEventListener('resize', autoScale);
+
+setTimeout(autoScale, 100);
+    status.style.position = 'static';
+    status.style.width = '120px';
+    status.style.display = 'block';
+    status.style.margin = '4px auto 12px';
+    status.style.padding = '2px 6px';
+
+    display.style.fontSize = '7rem';
+    display.style.padding = '16px 20px';
+    display.style.border = '3px solid #FFFFFF';
+
+    const digits = document.querySelectorAll('.digit');
+    digits.forEach(d => {
+        d.style.width = '50px';
+        d.style.margin = '0 5px';
+    });
+
+    document.querySelectorAll('.separator').forEach(s => {
+        s.style.width = '28px';
+    });
+}
+    const MASTER_ID = 'radio-secret-id-Zyxw-Vuts-9821-Kjhl'; 
+    const peer = new Peer(role === 'master' ? MASTER_ID : null);
+    
+    let conns = [];
+let conn, time = 0, timer = null, inputBuffer = "";
+    let seq = 0;
+    let startTime = 0;
+let savedBuffer = "";
+let editing = false;
+    let wakeLock = null;
+    let slaveTime = null;
+    let lastBlinkSecond = -1;
+    let cueTargetTime = null;
+let cueMasterTargetTime = null;
+let timerLocked = false;
+function updateConnDot() {
+
+    if (!conn || !conn.peerConnection) return;
+
+    conn.peerConnection.getStats().then(stats => {
+        stats.forEach(r => {
+
+            if (r.type === 'candidate-pair' && r.state === 'succeeded') {
+
+                const dot = document.getElementById('connDot');
+
+                if (r.localCandidateType === 'relay') {
+                    dot.style.color = "#facc15"; // 黄色
+                } else {
+                    dot.style.color = "#666"; // 白
+                }
+
+            }
+        });
+    });
+}
+    
+    let ignoreDiffUntil = 0;
+
+    // 操作エリアを表示する関数
+    function showControls() {
+    if (role === 'master') {
+        document.getElementById('uiArea').style.display = 'block';
+
+        setTimeout(autoScale, 50);
+    }
+}
+
+   function press(n) {
+
+    if (!editing) {
+        inputBuffer = "";
+        editing = true;
+    }
+
+    if (inputBuffer.length < 6) {
+        inputBuffer += n;
+        updatePreview();
+    }
+}
+    function clearInput() {
+    inputBuffer = "";
+    savedBuffer = "";
+    editing = false;
+    updatePreview();
+}
+   function updatePreview() {
+
+    const source =
+        inputBuffer !== ""
+            ? inputBuffer
+            : savedBuffer;
+
+    if (source === "") {
+        document.getElementById('inputPreview').innerText = "--:--:--";
+        return;
+    }
+
+    const d = source.padStart(6, '0');
+
+    document.getElementById('inputPreview').innerText =
+        d.slice(0,2) + ":" + d.slice(2,4) + ":" + d.slice(4,6);
+}
+function setCueCM() {
+
+    if (inputBuffer.length === 0) return;
+
+    const d = inputBuffer.padStart(6, '0');
+    cueMasterTargetTime = parseInt(d.slice(0,2)) * 3600 +
+                      parseInt(d.slice(2,4)) * 60 +
+                      parseInt(d.slice(4,6));
+
+    document.getElementById('cueMasterLabel').innerText = 'CM入り';
+
+    document.getElementById('cueMasterTime').innerText =
+        d.slice(0,2) + ':' +
+        d.slice(2,4) + ':' +
+        d.slice(4,6);
+    document.getElementById('cueMasterLabel').style.color = '#20E0D0';
+document.getElementById('cueMasterTime').style.color = '#CBD5E1';
+
+    sendToAll({
+        type: 'cueCM',
+        value: inputBuffer
+    });
+}
+    function setCueSong() {
+
+    if (inputBuffer.length === 0) return;
+
+    const d = inputBuffer.padStart(6, '0');
+        cueMasterTargetTime = parseInt(d.slice(0,2)) * 3600 +
+                      parseInt(d.slice(2,4)) * 60 +
+                      parseInt(d.slice(4,6));
+
+    document.getElementById('cueMasterLabel').innerText = '曲入り';
+
+    document.getElementById('cueMasterTime').innerText =
+        d.slice(0,2) + ':' +
+        d.slice(2,4) + ':' +
+        d.slice(4,6);
+        document.getElementById('cueMasterLabel').style.color = '#20E0D0';
+document.getElementById('cueMasterTime').style.color = '#CBD5E1';
+
+    sendToAll({
+        type: 'cueSong',
+        value: inputBuffer
+    });
+}
+    function setCueReturn() {
+
+    if (inputBuffer.length === 0) return;
+
+    const d = inputBuffer.padStart(6, '0');
+        cueMasterTargetTime = parseInt(d.slice(0,2)) * 3600 +
+                      parseInt(d.slice(2,4)) * 60 +
+                      parseInt(d.slice(4,6));
+
+    document.getElementById('cueMasterLabel').innerText = 'スタジオ戻り';
+
+    document.getElementById('cueMasterTime').innerText =
+        d.slice(0,2) + ':' +
+        d.slice(2,4) + ':' +
+        d.slice(4,6);
+        document.getElementById('cueMasterLabel').style.color = '#FFF02A';
+document.getElementById('cueMasterTime').style.color = '#CBD5E1';
+    sendToAll({
+        type: 'cueReturn',
+        value: inputBuffer
+    });
+}
+    function clearCue() {
+cueMasterTargetTime = null;
+    document.getElementById('cueMasterLabel').innerText = '--';
+    document.getElementById('cueMasterTime').innerText = '--:--:--';
+       document.getElementById('cueMasterLabel').style.color = '#64748B';
+document.getElementById('cueMasterTime').style.color = '#64748B';
+        
+    sendToAll({
+        type: 'cueClear'
+    });
+}
+    function setTimer() {
+        if (timer) return;
+        if(inputBuffer.length === 0) return;
+        const total = parseInt(inputBuffer.padStart(6, '0'));
+        const h = Math.floor(total / 10000);
+        const m = Math.floor((total % 10000) / 100);
+        const s = total % 100;
+        time = h * 3600 + m * 60 + s;
+        ignoreDiffUntil = Date.now() + 1000;
+        updateDisplay();
+        savedBuffer = inputBuffer;
+editing = false;
+updatePreview();
+       sendToAll({type: 'time', value: time});
+    }
+
+  async function keepScreenAwake() {
+    try {
+        if ('wakeLock' in navigator) {
+            wakeLock = await navigator.wakeLock.request('screen');
+        }
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+function updateDisplay() {
+
+    const h = Math.floor(time / 3600);
+    const m = Math.floor((time % 3600) / 60);
+    const s = time % 60;
+
+    const txt =
+        String(h).padStart(2,'0') +
+        String(m).padStart(2,'0') +
+        String(s).padStart(2,'0');
+
+    const digits =
+        document.querySelectorAll('#display .digit');
+
+    for(let i=0;i<6;i++){
+    digits[i].innerText = txt[i];
+}
+
+if (role === 'slave') {
+
+    if (time !== lastBlinkSecond) {
+
+        lastBlinkSecond = time;
+
+        document.querySelectorAll('.separator').forEach(s => {
+
+            s.style.opacity = '1';
+            s.style.color = '#ff2222';
+            s.style.textShadow =
+                '0 0 8px rgba(255,0,0,0.9), 0 0 16px rgba(255,0,0,0.55)';
+        });
+
+        setTimeout(() => {
+
+            document.querySelectorAll('.separator').forEach(s => {
+                s.style.opacity = '0.2';
+                s.style.textShadow = 'none';
+            });
+
+        }, 500);
+    }
+}
+
+if (role === 'cue') {
+
+    if (time !== lastBlinkSecond) {
+
+        lastBlinkSecond = time;
+
+        document.querySelectorAll('.separator').forEach(s => {
+
+            s.style.opacity = '1';
+            s.style.color = '#ff2222';
+            s.style.textShadow =
+                '0 0 8px rgba(255,0,0,0.9), 0 0 16px rgba(255,0,0,0.55)';
+        });
+
+        setTimeout(() => {
+
+            document.querySelectorAll('.separator').forEach(s => {
+                s.style.opacity = '0.2';
+                s.style.textShadow = 'none';
+            });
+
+        }, 500);
+    }
+}
+
+checkSlaveDiff();
+}
+
+   function toggleTimer() {
+
+    if (timerLocked) return;
+
+    const resetBtn = document.querySelector('.resetBtn');
+    const setBtn = document.querySelector('.setBtn');
+
+    if (timer) {
+        clearInterval(timer);
+        timer = null;
+
+        // ボタンを元に戻す
+        resetBtn.classList.remove('disabled');
+        setBtn.classList.remove('disabled');
+
+    } else {
+        startTime = Date.now() - (time * 1000);
+
+        timer = setInterval(() => {
+    time = Math.floor((Date.now() - startTime) / 1000);
+    updateDisplay();
+
+    if (cueMasterTargetTime !== null && time >= cueMasterTargetTime) {
+        clearCue();
+    }
+
+    sendToAll({type: 'time', value: time, seq: seq++});
+
+}, 100);
+
+        // ボタンを暗くする
+        resetBtn.classList.add('disabled');
+        setBtn.classList.add('disabled');
+    }
+}
+   function toggleTimerLock() {
+
+    timerLocked = !timerLocked;
+
+    const lock = document.getElementById('timerLock');
+    const startBtn = document.querySelector('.startBtn');
+
+    if (timerLocked) {
+        lock.classList.add('locked');
+        document.getElementById('timerLockIcon').classList.add('lockedIcon');
+
+        startBtn.style.background = '#334155';
+startBtn.style.color = '#94a3b8';
+
+    } else {
+        lock.classList.remove('locked');
+        document.getElementById('timerLockIcon').classList.remove('lockedIcon');
+
+        startBtn.style.background = '#f8f8f4';
+        startBtn.style.color = '#000';
+    }
+}
+
+    function checkSlaveDiff() {
+if (Date.now() < ignoreDiffUntil) return;
+    if (slaveTime === null) return;
+
+    const diff = Math.abs(time - slaveTime);
+
+    const alertEl = document.getElementById('slaveAlert');
+    const timeEl  = document.getElementById('slaveTimeText');
+
+    if (diff >= 3) {
+        alertEl.style.color = "#ff3030";
+        timeEl.style.color = "#ff3030";
+    } else {
+        alertEl.style.color = "#555";
+        timeEl.style.color = "#666";
+    }
+}
+    function resetTimer() { 
+if (timer) return;
+    clearInterval(timer);
+    timer = null;
+    time = 0;
+        ignoreDiffUntil = Date.now() + 1000;
+    startTime = Date.now();
+    updateDisplay();
+
+    setTimeout(() => {
+        sendToAll({type: 'time', value: time});
+    }, 50);
+}
+
+
+    const statusEl = document.getElementById('status');
+    function sendToAll(data) {
+    conns.forEach(c => {
+        if (c.open) c.send(data);
+    });
+}
+    function setStatus(text, className) { statusEl.innerText = text; statusEl.className = className; }
+
+    function connectToMaster() {
+        setStatus("CONNECTING...", "status-connecting");
+        conn = peer.connect(MASTER_ID);
+        conn.on('open', () => { setStatus("CONNECTED", "status-connected"); /* 子機は controls を表示しない */setTimeout(updateConnDot, 1000); });
+       let lastUpdateTime = 0;
+        let lastReceived = 0;
+
+let lastSeq = -1;
+
+conn.on('data', data => {
+
+   if (data.type === 'cueCM') {
+    const d = String(data.value).padStart(6, '0');
+
+    const h = parseInt(d.slice(0,2));
+    const m = parseInt(d.slice(2,4));
+    const s = parseInt(d.slice(4,6));
+
+    cueTargetTime = h * 3600 + m * 60 + s;
+       document.getElementById('cueLabel').innerText = 'CM入り';
+       document.getElementById('cueLabel').style.color = '#20E0D0';
+document.getElementById('cueRemain').style.color = '#20E0D0';
+
+    document.getElementById('cueTargetTime').innerText =
+        d.slice(0,2) + ':' +
+        d.slice(2,4) + ':' +
+        d.slice(4,6);
+}
+    if (data.type === 'cueSong') {
+    const d = String(data.value).padStart(6, '0');
+
+    const h = parseInt(d.slice(0,2));
+    const m = parseInt(d.slice(2,4));
+    const s = parseInt(d.slice(4,6));
+
+    cueTargetTime = h * 3600 + m * 60 + s;
+
+    document.getElementById('cueLabel').innerText = '曲入り';
+        document.getElementById('cueLabel').style.color = '#20E0D0';
+document.getElementById('cueRemain').style.color = '#20E0D0';
+
+    document.getElementById('cueTargetTime').innerText =
+        d.slice(0,2) + ':' +
+        d.slice(2,4) + ':' +
+        d.slice(4,6);
+}
+    if (data.type === 'cueReturn') {
+    const d = String(data.value).padStart(6, '0');
+
+    const h = parseInt(d.slice(0,2));
+    const m = parseInt(d.slice(2,4));
+    const s = parseInt(d.slice(4,6));
+
+    cueTargetTime = h * 3600 + m * 60 + s;
+
+    document.getElementById('cueLabel').innerText = 'スタジオ戻り';
+        document.getElementById('cueLabel').style.color = '#FFF02A';
+document.getElementById('cueRemain').style.color = '#FFF02A';
+
+    document.getElementById('cueTargetTime').innerText =
+        d.slice(0,2) + ':' +
+        d.slice(2,4) + ':' +
+        d.slice(4,6);
+}
+if (data.type === 'cueClear') {
+    console.log('CUE CLEAR RECEIVED');
+    cueTargetTime = null;
+
+    document.getElementById('cueLabel').innerText = '--';
+    document.getElementById('cueTargetTime').innerText = '--:--:--';
+    document.getElementById('cueRemain').innerText = '--:--';
+
+    document.getElementById('cueLabel').style.color = '#64748B';
+document.getElementById('cueTargetTime').style.color = '#64748B';
+document.getElementById('cueRemain').style.color = '#64748B';
+}
+    if (data.type === 'time') {
+    if (data.seq < lastSeq) return;
+    lastSeq = data.seq;
+
+    time = data.value;
+    updateDisplay();
+
+    if (cueTargetTime !== null) {
+        const remain = cueTargetTime - time;
+
+if (remain <= 0) {
+    cueTargetTime = null;
+
+    document.getElementById('cueTargetTime').innerText = '--:--:--';
+    document.getElementById('cueRemain').innerText = '--:--';
+} else {
+    const minutes = Math.floor(remain / 60);
+    const seconds = remain % 60;
+
+    document.getElementById('cueRemain').innerText =
+        String(minutes).padStart(2, '0') + ':' +
+        String(seconds).padStart(2, '0');
+}
+    }
+
+    if (conn) {
+        conn.send({
+            type: 'slaveTime',
+            value: time
+        });
+    }
+}
+});
+        conn.on('close', () => { setStatus("UNLINK", "status-unlink"); setTimeout(connectToMaster, 3000); });
+    }
+peer.on('disconnected', () => {
+    if (role === 'master') {
+        console.log('PeerServer disconnected. Reconnecting...');
+        peer.reconnect();
+    }
+});
+   peer.on('open', () => {
+    if (role === 'slave') {
+        const overlay = document.getElementById('tapToConnect');
+        overlay.style.display = 'flex'; // ボタンを表示
+        overlay.addEventListener('click', () => {
+            overlay.style.display = 'none'; // ボタンを隠す
+            connectToMaster();
+        }, { once: true });
+    }
+});
+    peer.on('open', () => {
+    if (role === 'cue') {
+        const overlay = document.getElementById('tapToConnect');
+        overlay.style.display = 'flex';
+
+        overlay.addEventListener('click', () => {
+            overlay.style.display = 'none';
+            connectToMaster();
+        }, { once: true });
+    }
+});
+    peer.on('connection', c => {
+    conn = c;
+    conns.push(c);
+c.on('close', () => {
+    conns = conns.filter(x => x !== c);
+});
+    showControls();
+    setStatus("CONNECTED", "status-connected");
+        setTimeout(updateConnDot, 1000);
+
+    c.on('data', data => {
+        if(data.type === 'cueCM') {
+    const d = String(data.value).padStart(6, '0');
+
+    document.getElementById('cueTargetTime').innerText =
+        d.slice(0,2) + ':' +
+        d.slice(2,4) + ':' +
+        d.slice(4,6);
+}
+
+        if(data.type === 'time') {
+            time = data.value;
+            updateDisplay();
+        }
+
+       if(data.type === 'slaveTime') {
+
+    slaveTime = data.value;
+
+    const h = Math.floor(slaveTime / 3600);
+    const m = Math.floor((slaveTime % 3600) / 60);
+    const s = slaveTime % 60;
+
+    document.getElementById('slaveTimeText').innerText =
+    String(h).padStart(2,'0') + ":" +
+    String(m).padStart(2,'0') + ":" +
+    String(s).padStart(2,'0');
+        
+}
+    });
+});
+if (role === 'slave') {
+    
+    const displayGroup = document.getElementById('displayGroup');
+
+    function autoScaleSlave() {
+
+        displayGroup.style.transform =
+            'rotate(90deg) scale(1)';
+
+        const rect =
+            displayGroup.getBoundingClientRect();
+
+        const scaleX =
+            (window.innerHeight * 0.88) / rect.width;
+
+        const scaleY =
+            (window.innerWidth * 0.88) / rect.height;
+
+        const scale =
+            Math.min(scaleX, scaleY);
+
+        displayGroup.style.transform =
+            `rotate(90deg) scale(${scale})`;
+    }
+
+    window.addEventListener('load', autoScaleSlave);
+    window.addEventListener('resize', autoScaleSlave);
+
+    setTimeout(autoScaleSlave, 100);
+
+    displayGroup.style.transformOrigin = 'center center';
+    displayGroup.style.display = 'flex';
+    displayGroup.style.flexDirection = 'column';
+    displayGroup.style.alignItems = 'center';
+    document.querySelectorAll('.digit').forEach(d => {
+d.style.margin = '0 12px';
+});
+document.querySelectorAll('.separator').forEach(s => {
+    s.style.fontSize = '1.0em';   // お好みで 1.05em や 1.1em
+    s.style.width = '52px';
+    s.style.fontWeight = '900';
+});
+
+    
+    const status = document.getElementById('status');
+    status.style.position = 'static';
+    status.style.marginTop = '10px';
+}
+   if (role === 'cue') {
+
+    const displayGroup = document.getElementById('displayGroup');
+const display = document.getElementById('display');
+       document.getElementById('cueInfo').style.display = 'block';
+
+    displayGroup.style.transformOrigin = 'center center';
+    displayGroup.style.display = 'flex';
+    displayGroup.style.flexDirection = 'column';
+    displayGroup.style.alignItems = 'center';
+
+    display.style.marginLeft = 'auto';
+    display.style.marginRight = 'auto';
+
+    function autoScaleCue() {
+
+        displayGroup.style.transform = 'scale(1)';
+
+        const rect = displayGroup.getBoundingClientRect();
+
+        const scaleX =
+            (window.innerWidth * 0.88) / rect.width;
+
+        const scaleY =
+            (window.innerHeight * 0.88) / rect.height;
+
+       const scale =
+    Math.min(scaleX, scaleY) * 0.7;
+
+displayGroup.style.transform =
+    `scale(${scale})`;
+    }
+
+    window.addEventListener('load', autoScaleCue);
+    window.addEventListener('resize', autoScaleCue);
+
+    setTimeout(autoScaleCue, 100);
+
+    document.querySelectorAll('.digit').forEach(d => {
+        d.style.margin = '0 12px';
+    });
+
+    document.querySelectorAll('.separator').forEach(s => {
+        s.style.fontSize = '1.0em';
+        s.style.width = '52px';
+        s.style.fontWeight = '900';
+    });
+
+    const status = document.getElementById('status');
+    status.style.position = 'static';
+    status.style.marginTop = '10px';
+}
+      document.addEventListener('pointerdown', () => {
+    if (!wakeLock) keepScreenAwake();
+}, { once: true });
+
+document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+        keepScreenAwake();
+    }
+});
+</script>
+<video autoplay muted loop playsinline width="1" height="1">
+    <source src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4" type="video/mp4">
+</video>
+    
+</body>
+</html>
